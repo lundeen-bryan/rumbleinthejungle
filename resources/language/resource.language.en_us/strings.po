@@ -1,0 +1,91 @@
+# Kodi Media Center language file
+# Addon Name: Rumble
+# Addon id: plugin.video.rumble
+
+msgid ""
+msgstr ""
+
+#resources/settings.xml
+msgctxt "#30000"
+msgid "Playback Method"
+msgstr ""
+
+#main.py Main menu
+msgctxt "#30050"
+msgid "Battle Leaderboard"
+msgstr ""
+
+msgctxt "#30051"
+msgid "Categories"
+msgstr ""
+
+msgctxt "#30052"
+msgid "Live Streams"
+msgstr ""
+
+#lib\main.py Search menu
+msgctxt "#30100"
+msgid "Search Videos"
+msgstr ""
+
+msgctxt "#30101"
+msgid "Search Channels"
+msgstr ""
+
+msgctxt "#30102"
+msgid "Search Users"
+msgstr ""
+
+#main.py Other
+msgctxt "#30150"
+msgid "Page"
+msgstr ""
+
+msgctxt "#30151"
+msgid "Add to Rumble favourites"
+msgstr "Add to Rumble favorites"
+
+msgctxt "#30152"
+msgid "Added to Rumble favourites"
+msgstr "Added to Rumble favorites"
+
+msgctxt "#30153"
+msgid "Remove from Rumble favourites"
+msgstr "Remove from Rumble favorites"
+
+msgctxt "#30154"
+msgid "Removed from Rumble favourites"
+msgstr "Removed from Rumble favorites"
+
+msgctxt "#30155"
+msgid "No videos or channels added to favourites"
+msgstr "No videos or channels added to favorites"
+
+msgctxt "#30156"
+msgid "Subscribers"
+msgstr ""
+
+msgctxt "#30157"
+msgid "Type something to search"
+msgstr ""
+
+msgctxt "#30158"
+msgid "Add to queue"
+msgstr ""
+
+#main.py Session
+msgctxt "#30200"
+msgid "Session has been reset"
+msgstr ""
+
+msgctxt "#30201"
+msgid "Login Successful - Session has been set"
+msgstr ""
+
+msgctxt "#30202"
+msgid "Login Failed"
+msgstr ""
+
+msgctxt "#30203"
+msgid "No details detected - please save login details first before running"
+msgstr ""

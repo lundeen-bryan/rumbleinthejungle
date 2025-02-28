@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addons>
+    <addon id="plugin.video.rumbleinthejungle" name="Rumble In The Jungle" version="1.0.0" provider-name="lundeen-bryan">
+        <extension point="xbmc.python.script" library="main.py">
+            <provides>video</provides>
+        </extension>
+        <extension point="xbmc.addon.metadata">
+            <summary>Stream Rumble videos on Kodi.</summary>
+            <description>A Kodi 21 add-on to browse and stream videos from Rumble.</description>
+            <disclaimer>We are not associated with rumble.com or the Kodi Team.</disclaimer>
+            <platform>all</platform>
+        </extension>
+    </addon>
+</addons>

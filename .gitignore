@@ -1,0 +1,9 @@
+/logs
+/.venv
+/docs
+/jupyter
+/excel
+/data
+/.mypy_cache
+/.vscode
+package_addon.py

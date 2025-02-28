@@ -1,0 +1,148 @@
+This script will create a Python virtual environment using Micromamba.
+Ensure that Git-Bash and Micromamba are properly installed.
+Do you want to proceed? (Y/n): Enter the Python version (e.g., 3.8): Enter environment name (Press ENTER for default '.venv'): 
+Transaction
+
+  Prefix: C:\Users\lunde\AppData\Roaming\Kodi\addons\plugin.video.rumbleinthejungle\.venv
+
+  Updating specs:
+
+   - python=3.11.11
+
+
+  Package                 Version  Build               Channel           Size
+-------------------------------------------------------------------------------
+  Install:
+-------------------------------------------------------------------------------
+
+  + ucrt             10.0.22621.0  h57928b3_1          conda-forge     Cached
+  + ca-certificates     2025.1.31  h56e8100_0          conda-forge     Cached
+  + vc14_runtime      14.42.34433  h6356254_24         conda-forge     Cached
+  + vc                       14.3  h5fd82a7_24         conda-forge     Cached
+  + tk                     8.6.13  h5226925_1          conda-forge     Cached
+  + openssl                 3.4.1  ha4e3fda_0          conda-forge     Cached
+  + libzlib                 1.3.1  h2466b09_2          conda-forge     Cached
+  + libsqlite              3.49.1  h67fdade_1          conda-forge     Cached
+  + liblzma                 5.6.4  h2466b09_0          conda-forge     Cached
+  + libffi                  3.4.6  h537db12_0          conda-forge     Cached
+  + bzip2                   1.0.8  h2466b09_7          conda-forge     Cached
+  + libexpat                2.6.4  he0c23c2_0          conda-forge     Cached
+  + tzdata                  2025a  h78e105d_0          conda-forge     Cached
+  + python                3.11.11  h3f84c4b_1_cpython  conda-forge     Cached
+  + wheel                  0.45.1  pyhd8ed1ab_1        conda-forge     Cached
+  + setuptools             75.8.2  pyhff2d567_0        conda-forge     Cached
+  + pip                    25.0.1  pyh8b19718_0        conda-forge     Cached
+
+  Summary:
+
+  Install: 17 packages
+
+  Total download: 0 B
+
+-------------------------------------------------------------------------------
+
+
+Confirm changes: [Y/n] 
+Transaction starting
+Linking ucrt-10.0.22621.0-h57928b3_1
+Linking ca-certificates-2025.1.31-h56e8100_0
+Linking vc14_runtime-14.42.34433-h6356254_24
+Linking vc-14.3-h5fd82a7_24
+Linking tk-8.6.13-h5226925_1
+Linking openssl-3.4.1-ha4e3fda_0
+Linking libzlib-1.3.1-h2466b09_2
+Linking libsqlite-3.49.1-h67fdade_1
+Linking liblzma-5.6.4-h2466b09_0
+Linking libffi-3.4.6-h537db12_0
+Linking bzip2-1.0.8-h2466b09_7
+Linking libexpat-2.6.4-he0c23c2_0
+Linking tzdata-2025a-h78e105d_0
+Linking python-3.11.11-h3f84c4b_1_cpython
+Linking wheel-0.45.1-pyhd8ed1ab_1
+Linking setuptools-75.8.2-pyhff2d567_0
+Linking pip-25.0.1-pyh8b19718_0
+
+Transaction finished
+
+To activate this environment, use:
+
+    micromamba activate C:\Users\lunde\AppData\Roaming\Kodi\addons\plugin.video.rumbleinthejungle\.venv
+
+Or to execute a single command in this environment, use:
+
+    micromamba run -p C:\Users\lunde\AppData\Roaming\Kodi\addons\plugin.video.rumbleinthejungle\.venv mycommand
+
+info     libmamba ****************** Backtrace Start ******************
+debug    libmamba Loading configuration
+trace    libmamba Compute configurable 'create_base'
+trace    libmamba Compute configurable 'no_env'
+trace    libmamba Compute configurable 'no_rc'
+trace    libmamba Compute configurable 'rc_files'
+trace    libmamba Compute configurable 'root_prefix'
+trace    libmamba Get RC files configuration from locations up to HomeDir
+trace    libmamba Configuration not found at 'C:\Users\lunde\.mambarc'
+trace    libmamba Configuration not found at 'C:\Users\lunde\.mamba\mambarc.d'
+trace    libmamba Configuration not found at 'C:\Users\lunde\.mamba\mambarc'
+trace    libmamba Configuration not found at 'C:\Users\lunde\.mamba\.mambarc'
+trace    libmamba Configuration not found at 'C:\Users\lunde\AppData\Roaming\mamba\mambarc.d'
+trace    libmamba Configuration not found at 'C:\Users\lunde\AppData\Roaming\mamba\mambarc'
+trace    libmamba Configuration not found at 'C:\Users\lunde\AppData\Roaming\mamba\.mambarc'
+trace    libmamba Configuration found at 'C:\Users\lunde\.condarc'
+trace    libmamba Configuration not found at 'C:\Users\lunde\.conda\condarc.d'
+trace    libmamba Configuration not found at 'C:\Users\lunde\.conda\condarc'
+trace    libmamba Configuration not found at 'C:\Users\lunde\.conda\.condarc'
+trace    libmamba Configuration not found at 'C:\Users\lunde\AppData\Roaming\mamba\..\conda\condarc.d'
+trace    libmamba Configuration not found at 'C:\Users\lunde\AppData\Roaming\mamba\..\conda\condarc'
+trace    libmamba Configuration not found at 'C:\Users\lunde\AppData\Roaming\mamba\..\conda\.condarc'
+trace    libmamba Configuration not found at 'C:\Users\lunde\micromamba\.mambarc'
+trace    libmamba Configuration not found at 'C:\Users\lunde\micromamba\condarc.d'
+trace    libmamba Configuration not found at 'C:\Users\lunde\micromamba\condarc'
+trace    libmamba Configuration not found at 'C:\Users\lunde\micromamba\.condarc'
+trace    libmamba Configuration not found at 'C:\ProgramData\conda\.mambarc'
+trace    libmamba Configuration not found at 'C:\ProgramData\conda\condarc.d'
+trace    libmamba Configuration not found at 'C:\ProgramData\conda\condarc'
+trace    libmamba Configuration not found at 'C:\ProgramData\conda\.condarc'
+trace    libmamba Update configurable 'no_env'
+trace    libmamba Compute configurable 'envs_dirs'
+trace    libmamba Compute configurable 'file_specs'
+trace    libmamba Compute configurable 'spec_file_env_name'
+trace    libmamba Compute configurable 'env_name'
+trace    libmamba Compute configurable 'use_target_prefix_fallback'
+trace    libmamba Compute configurable 'target_prefix'
+trace    libmamba Get RC files configuration from locations up to TargetPrefix
+trace    libmamba Configuration not found at 'C:\Users\lunde\micromamba\envs\.venv\.mambarc'
+trace    libmamba Configuration not found at 'C:\Users\lunde\micromamba\envs\.venv\condarc.d'
+trace    libmamba Configuration not found at 'C:\Users\lunde\micromamba\envs\.venv\condarc'
+trace    libmamba Configuration not found at 'C:\Users\lunde\micromamba\envs\.venv\.condarc'
+trace    libmamba Configuration not found at 'C:\Users\lunde\.mambarc'
+trace    libmamba Configuration not found at 'C:\Users\lunde\.mamba\mambarc.d'
+trace    libmamba Configuration not found at 'C:\Users\lunde\.mamba\mambarc'
+trace    libmamba Configuration not found at 'C:\Users\lunde\.mamba\.mambarc'
+trace    libmamba Configuration not found at 'C:\Users\lunde\AppData\Roaming\mamba\mambarc.d'
+trace    libmamba Configuration not found at 'C:\Users\lunde\AppData\Roaming\mamba\mambarc'
+trace    libmamba Configuration not found at 'C:\Users\lunde\AppData\Roaming\mamba\.mambarc'
+trace    libmamba Configuration found at 'C:\Users\lunde\.condarc'
+trace    libmamba Configuration not found at 'C:\Users\lunde\.conda\condarc.d'
+trace    libmamba Configuration not found at 'C:\Users\lunde\.conda\condarc'
+trace    libmamba Configuration not found at 'C:\Users\lunde\.conda\.condarc'
+trace    libmamba Configuration not found at 'C:\Users\lunde\AppData\Roaming\mamba\..\conda\condarc.d'
+trace    libmamba Configuration not found at 'C:\Users\lunde\AppData\Roaming\mamba\..\conda\condarc'
+trace    libmamba Configuration not found at 'C:\Users\lunde\AppData\Roaming\mamba\..\conda\.condarc'
+trace    libmamba Configuration not found at 'C:\Users\lunde\micromamba\.mambarc'
+trace    libmamba Configuration not found at 'C:\Users\lunde\micromamba\condarc.d'
+trace    libmamba Configuration not found at 'C:\Users\lunde\micromamba\condarc'
+trace    libmamba Configuration not found at 'C:\Users\lunde\micromamba\.condarc'
+trace    libmamba Configuration not found at 'C:\ProgramData\conda\.mambarc'
+trace    libmamba Configuration not found at 'C:\ProgramData\conda\condarc.d'
+trace    libmamba Configuration not found at 'C:\ProgramData\conda\condarc'
+trace    libmamba Configuration not found at 'C:\ProgramData\conda\.condarc'
+trace    libmamba Update configurable 'no_env'
+trace    libmamba Compute configurable 'relocate_prefix'
+trace    libmamba Compute configurable 'target_prefix_checks'
+error    libmamba No prefix found at: C:\Users\lunde\micromamba\envs\.venv
+error    libmamba Environment must first be created with "micromamba create -n {env_name} ..."
+critical libmamba Aborting.
+info     libmamba ****************** Backtrace End ********************
+Environment '.venv' with Python 3.11.11 has been created.
+Activate your environment using: micromamba activate .venv
+If you cannot activate it, you might need to restart your shell.
