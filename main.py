@@ -49,16 +49,25 @@ def favorites_create():
     xbmc.sleep(1)
 
 
-def favorites_load( return_string = False ):
+def favorites_load(return_string=False):
+    """
+    Load favorites from file into a variable.
 
-    """ load favourites from file into variable """
+    Parameters:
+    return_string (bool): If True, the function returns the favorites as a string.
+                           If False (default), the function returns the favorites as a list.
 
-    if os.path.exists( favorites ):
-        fav_str = open( favorites ).read()
+    Returns:
+    str or list: The favorites as a string or list, depending on the return_string parameter.
+                  If the favorites file does not exist, an empty string or list is returned.
+    """
+
+    if os.path.exists(favorites):
+        fav_str = open(favorites).read()
         if return_string:
             return fav_str
         if fav_str:
-            return json.loads( fav_str )
+            return json.loads(fav_str)
     else:
         favorites_create()
 
@@ -67,6 +76,7 @@ def favorites_load( return_string = False ):
         return ''
 
     return []
+
 
 
 def to_unicode(text, encoding='utf-8', errors='strict'):
