@@ -111,10 +111,17 @@ def to_unicode(text, encoding='utf-8', errors='strict'):
 
 
 
-def get_search_string( heading='', message='' ):
+def get_search_string(heading='', message=''):
+    """
+    Ask the user for a search string.
 
-    """ Ask the user for a search string """
+    Parameters:
+    heading (str): The heading for the keyboard input dialog. Default is an empty string.
+    message (str): The message for the keyboard input dialog. Default is an empty string.
 
+    Returns:
+    str: The search string entered by the user. If the user cancels the input, the function returns None.
+    """
     search_string = None
 
     keyboard = xbmc.Keyboard(message, heading)
@@ -124,6 +131,7 @@ def get_search_string( heading='', message='' ):
         search_string = to_unicode(keyboard.getText())
 
     return search_string
+
 
 
 def home_menu():
