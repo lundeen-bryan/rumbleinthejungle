@@ -69,14 +69,25 @@ def favorites_load( return_string = False ):
     return []
 
 
-def to_unicode( text, encoding='utf-8', errors='strict' ):
+def to_unicode(text, encoding='utf-8', errors='strict'):
+    """
+    Forces text to unicode.
 
-    """ Forces text to unicode """
+    Converts bytes to unicode using the specified encoding and error handling.
 
+    Parameters:
+    text (str or bytes): The text to convert. If it's already a string, it's returned as is.
+    encoding (str, optional): The encoding to use for conversion. Default is 'utf-8'.
+    errors (str, optional): The error handling method. Default is 'strict'.
+
+    Returns:
+    str: The converted text as a unicode string.
+    """
     if isinstance(text, bytes):
         return text.decode(encoding, errors=errors)
 
     return text
+
 
 
 def get_search_string( heading='', message='' ):
