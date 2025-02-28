@@ -932,95 +932,98 @@ def comments_show( url ):
         notify( "Cannot find comments", "Comments" )
 
 def main():
+    """
+    Main method to start the plugin.
 
-    """ main method to start plugin """
+    Parameters:
+    params (dict): A dictionary containing the parameters passed to the plugin.
 
-    params=get_params()
+    Returns:
+    None
+    """
 
-    mode=int(params.get( 'mode', 0 ))
-    page=int(params.get( 'page', 1 ))
-    play=int(params.get( 'play', 0 ))
-    fav_mode=int(params.get( 'fav_mode', 0 ))
+    params = get_params()
 
-    url = params.get( 'url', None )
+    mode = int(params.get('mode', 0))
+    page = int(params.get('page', 1))
+    play = int(params.get('play', 0))
+    fav_mode = int(params.get('fav_mode', 0))
+
+    url = params.get('url', None)
     if url:
-        url=urllib.parse.unquote_plus(url)
+        url = urllib.parse.unquote_plus(url)
 
-    name = params.get( 'name', None )
+    name = params.get('name', None)
     if name:
         name = urllib.parse.unquote_plus(name)
 
-    thumb=params.get( 'thumb', None )
+    thumb = params.get('thumb', None)
     if thumb:
-        thumb=urllib.parse.unquote_plus(thumb)
+        thumb = urllib.parse.unquote_plus(thumb)
 
-    fanart=params.get( 'fanart', None )
+    fanart = params.get('fanart', None)
     if fanart:
-        fanart=urllib.parse.unquote_plus(fanart)
+        fanart = urllib.parse.unquote_plus(fanart)
 
-    plot=params.get( 'plot', None )
+    plot = params.get('plot', None)
     if plot:
-        plot=urllib.parse.unquote_plus(plot)
+        plot = urllib.parse.unquote_plus(plot)
 
-    subtitle=params.get( 'subtitle', None )
+    subtitle = params.get('subtitle', None)
     if subtitle:
-        subtitle=urllib.parse.unquote_plus(subtitle)
+        subtitle = urllib.parse.unquote_plus(subtitle)
 
-    cat=params.get( 'cat', None )
+    cat = params.get('cat', None)
     if cat:
-        cat=urllib.parse.unquote_plus(cat)
+        cat = urllib.parse.unquote_plus(cat)
 
-    search=params.get( 'search', None )
+    search = params.get('search', None)
     if search:
-        search=urllib.parse.unquote_plus(search)
+        search = urllib.parse.unquote_plus(search)
 
-    folder=params.get( 'folder', None )
+    folder = params.get('folder', None)
     if folder:
-        folder=urllib.parse.unquote_plus(folder)
+        folder = urllib.parse.unquote_plus(folder)
 
-    folder=params.get( 'folder', None )
-    if folder:
-        folder=urllib.parse.unquote_plus(folder)
-
-
-    if mode==0:
+    if mode == 0:
         home_menu()
-    elif mode==1:
+    elif mode == 1:
         search_menu()
-    elif mode==2:
-        search_items(url,cat)
-    elif mode==3:
+    elif mode == 2:
+        search_items(url, cat)
+    elif mode == 3:
         if search and search is not None:
             pagination(url, page, cat, search)
         else:
             pagination(url, page, cat)
-    elif mode==4:
+    elif mode == 4:
         play_video(name, url, thumb, play)
-    elif mode in [5,6]:
+    elif mode in [5, 6]:
         if '\\ ' in name:
             name = name.split('\\ ')[1]
         if '  - ' in name:
             name = name.split('  - ')[0]
         if mode == 5:
-            favorite_add( name, url, fav_mode, thumb, fanart, plot, cat, str(folder), str(play) )
+            favorite_add(name, url, fav_mode, thumb, fanart, plot, cat, str(folder), str(play))
         else:
-            favorite_remove( name )
-    elif mode==7:
+            favorite_remove(name)
+    elif mode == 7:
         favorites_show()
-    elif mode==8:
+    elif mode == 8:
         ADDON.openSettings()
-    elif mode==9:
+    elif mode == 9:
         favorites_import()
-    elif mode==10:
+    elif mode == 10:
         login_session_reset()
-    elif mode==11:
+    elif mode == 11:
         subscribe(name, cat)
-    elif mode==12:
+    elif mode == 12:
         playlist_manage(url, cat)
-    elif mode==13:
+    elif mode == 13:
         comments_show(url)
-    elif mode==14:
+    elif mode == 14:
         login_test()
+
 
 if __name__ == "__main__":
     main()
