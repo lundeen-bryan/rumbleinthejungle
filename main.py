@@ -38,15 +38,26 @@ favorites = xbmcvfs.translatePath(os.path.join(ADDON.getAddonInfo('profile'), 'f
 
 
 def favorites_create():
+    """
+    Creates favorite directory if it doesn't exist.
 
-    """ creates favorite directory if doesn't exist """
+    The function checks if the directory specified by the addon's profile path exists.
+    If it doesn't exist, the function creates the directory. After the directory creation,
+    the function waits for 1 millisecond to ensure the directory is fully created before proceeding.
 
+    Parameters:
+    None
+
+    Returns:
+    None
+    """
     addon_data_path = xbmcvfs.translatePath(ADDON.getAddonInfo('profile'))
 
     if os.path.exists(addon_data_path) is False:
         os.mkdir(addon_data_path)
 
     xbmc.sleep(1)
+
 
 
 def favorites_load(return_string=False):
