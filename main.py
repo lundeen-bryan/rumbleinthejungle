@@ -573,31 +573,22 @@ def dir_list_create( data, cat, video_type='video', search = False, play=0 ):
 
     return amount
 
-def get_video_id( url ):
-
+def get_playlist_video_id(url):
     """
-    gets a video id from a URL
-    helps in resolving
-    """
+    Extracts the playlist video ID from a given URL.
 
-    data = request_get(url)
+    This function retrieves the HTML content of the provided URL and uses a regular
+    expression to find the 'data-id' attribute, which represents the playlist video ID.
 
-    video_id = re.compile(
-        ',\"embedUrl\":\"' + BASE_URL + '/embed/(.*?)\/\",',
-        re.MULTILINE|re.DOTALL|re.IGNORECASE
-    ).findall(data)
+    Args:
+        url (str): The URL of the playlist video page.
 
-    if video_id:
-        return video_id[0]
-    return False
+    Returns:
+        str or False: The extracted playlist video ID if found, or False if not found.
 
-
-
-def get_playlist_video_id( url ):
-
-    """
-    gets a playlist video id from a URL
-    helps in adding video to playlist
+    Note:
+        This function is useful for adding videos to playlists, as it provides the
+        necessary ID for such operations.
     """
 
     data = request_get(url)
@@ -612,9 +603,37 @@ def get_playlist_video_id( url ):
         return video_id[0]
     return False
 
-def resolver( url ):
 
-    """ Resolves a URL for rumble & returns resolved link to video """
+def resolver(url):
+    """
+    Resolves a Rumble video URL and returns the direct media link.
+
+    This function takes a Rumble video URL, extracts the video ID, and then fetches
+    available quality options from Rumble's API. It selects the appropriate media URL
+    based on the user's playback method preference.
+
+    Args:
+        url (str): The Rumble video URL to resolve.
+
+    Returns:
+        str or False: The resolved direct media URL if successful, False otherwise.
+
+    Behavior:
+        - Playback method 0 (high auto): Selects the highest quality automatically.
+        - Playback method 1 (low auto): Selects the lowest quality automatically.
+        - Playback method 2 (quality select): Prompts the user to choose the quality.
+
+    Notes:
+        - Supports various video qualities: 1080p, 720p, 480p, 360p, and HLS.
+        - Handles m3u8 (HLS) streams separately.
+        - Uses regex to parse the API response for video URLs.
+        - Replaces escaped forward slashes in the final URL.
+
+    Dependencies:
+        - Requires the ADDON settings for 'playbackMethod'.
+        - Uses external functions: get_video_id, request_get.
+        - May import lib.m3u8 for HLS stream processing.
+    """
 
     # playback options - 0: high auto, 1: low auto, 2: quality select
     playback_method = int( ADDON.getSetting('playbackMethod') )
@@ -685,9 +704,32 @@ def resolver( url ):
     return media_url
 
 
-def play_video( name, url, thumb, play=2 ):
+def play_video(name, url, thumb, play=2):
+    """
+    Resolves and plays a video in Kodi.
 
-    """ method to play video """
+    This function takes a video URL, resolves it to a playable stream, and initiates
+    playback in Kodi. It handles different playback methods and applies user settings.
+
+    Args:
+        name (str): The title of the video to be played.
+        url (str): The initial URL of the video, which will be resolved.
+        thumb (str): The URL or path of the video's thumbnail image.
+        play (int, optional): The playback method to use. Defaults to 2.
+                              1: Immediate playback using xbmc.Player().
+                              2: Deferred playback using xbmcplugin.setResolvedUrl().
+
+    Behavior:
+        - Resolves the video URL using the resolver() function.
+        - Applies HTTP protocol if specified in addon settings.
+        - Creates a ListItem with video metadata and artwork.
+        - Initiates playback based on the 'play' parameter.
+        - Displays an error dialog if the video URL cannot be resolved.
+
+    Note:
+        This function relies on Kodi's xbmc and xbmcplugin modules for playback,
+        as well as addon-specific settings and helper functions.
+    """
 
     # get video link
     url = resolver(url)
@@ -714,10 +756,25 @@ def play_video( name, url, thumb, play=2 ):
         xbmcgui.Dialog().ok( 'Error', 'Video not found' )
 
 
-def search_items( url, cat ):
+def search_items(url, cat):
+    """
+    Performs a search on Rumble based on user input.
 
-    """ Searches rumble  """
+    This function prompts the user for a search string, encodes it,
+    and then calls the pagination function to display search results.
 
+    Parameters:
+    url (str): The base URL for the search operation.
+    cat (str): The category of the search (e.g., 'video', 'channel').
+
+    Returns:
+    None: This function doesn't return a value, but it triggers
+          the display of search results through the pagination function.
+
+    Note:
+    If the user cancels the search input, the function returns early
+    without performing a search.
+    """
     search_str = get_search_string(heading="Search")
 
     if not search_str:
@@ -725,7 +782,7 @@ def search_items( url, cat ):
 
     title = urllib.parse.quote_plus(search_str)
 
-    pagination( url, 1, cat, title )
+    pagination(url, 1, cat, title)
 
 
 def favorites_show():
