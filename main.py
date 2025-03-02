@@ -135,9 +135,19 @@ def get_search_string(heading='', message=''):
 
 
 def home_menu():
+    """
+    Creates home menu.
 
-    """ Creates home menu """
+    This function generates the main menu options for the Rumble plugin.
+    It includes options for searching, favorites, subscriptions, following,
+    watch later, battle leaderboard, categories, live streams, and settings.
 
+    Parameters:
+    None
+
+    Returns:
+    None
+    """
     # Search
     add_dir( get_string(137), '', 1, { 'thumb': 'search.png' } )
     # Favorites
@@ -164,6 +174,7 @@ def home_menu():
     add_dir( get_string(5), '', 8, { 'thumb': 'settings.png' } )
 
     xbmcplugin.endOfDirectory( PLUGIN_ID, cacheToDisc=False )
+
 
 def search_menu():
 
