@@ -152,8 +152,37 @@ class CommentWindow(xbmcgui.WindowXML):
         return line_item
 
     def refresh_label(self, line_item, selected=True):
+        """
+        Refreshes the label of a comment item in the Kodi UI.
 
-        """ Refreshes comment label """
+        This method updates the display of a comment by retrieving its properties
+        and creating a new label using the create_label method. It's typically used
+        when the appearance of a comment needs to be updated, such as when it's
+        selected or deselected in the UI.
+
+        Args:
+            line_item (xbmcgui.ListItem): The ListItem object representing the comment
+                in the Kodi UI. This object should have properties set for 'id',
+                'comment_author_name', 'comment_post_time_ago', and 'comment'.
+            selected (bool, optional): Indicates whether the item is currently selected.
+                Defaults to True.
+
+        Returns:
+            None
+
+        Note:
+            This method assumes that the line_item has been previously created with
+            the necessary properties set. It uses the create_label method to format
+            the label string.
+
+        Example:
+            comment_item = xbmcgui.ListItem()
+            comment_item.setProperty('id', '12345')
+            comment_item.setProperty('comment_author_name', 'John Doe')
+            comment_item.setProperty('comment_post_time_ago', '2 hours ago')
+            comment_item.setProperty('comment', 'Great video!')
+            self.refresh_label(comment_item, selected=True)
+        """
 
         comment_id = line_item.getProperty('id')
         comment_author_name = line_item.getProperty('comment_author_name')
@@ -170,8 +199,39 @@ class CommentWindow(xbmcgui.WindowXML):
         )
 
     def create_label(self, comment_id, comment_author_name, comment_post_time_ago, comment, selected=False):
+        """
+        Creates a formatted label string for displaying a comment in the Kodi UI.
 
-        """ Creates label to view comments """
+        This method constructs a string that combines the comment author's name,
+        the comment text, and the time since the comment was posted. It uses
+        Kodi's color tags to style different parts of the label for better
+        visual distinction in the UI.
 
+        Args:
+            comment_id (str): The unique identifier of the comment. Not used in
+                              the current implementation but may be useful for
+                              future enhancements.
+            comment_author_name (str): The name of the comment's author.
+            comment_post_time_ago (str): A string representing how long ago the
+                                         comment was posted (e.g., "2 hours ago").
+            comment (str): The text content of the comment.
+            selected (bool, optional): Indicates whether the comment is currently
+                                       selected in the UI. Not used in the current
+                                       implementation. Defaults to False.
+
+        Returns:
+            str: A formatted string representing the comment, ready for display
+                 in the Kodi UI. The string includes Kodi color tags for styling.
+
+        Example:
+            >>> create_label("123", "JohnDoe", "2 hours ago", "Great video!")
+            'JohnDoe [COLOR white]Great video![/COLOR] [COLOR orange](2 hours ago)[/COLOR]'
+
+        Note:
+            - The comment text is processed through the clean_text() function,
+              which is assumed to sanitize or format the text appropriately.
+            - Kodi color tags are used: white for the comment text and orange
+              for the post time.
+        """
         return comment_author_name + ' [COLOR white]' + clean_text( comment ) \
             + '[/COLOR] [COLOR orange](' + comment_post_time_ago + ')[/COLOR]'
