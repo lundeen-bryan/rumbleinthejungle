@@ -1281,17 +1281,34 @@ def add_dir(name, url, mode, images={}, info_labels={}, cat='', folder=True, fav
 
     xbmcplugin.addDirectoryItem(handle=PLUGIN_ID, url=link, listitem=list_item, isFolder=folder)
 
-def playlist_manage( url, action="add" ):
+def playlist_manage(url, action="add"):
+    """
+    Manages a video in Rumble's playlist by adding or deleting it.
 
-    """ Adds to Rumble's Playlist """
-    video_id = get_playlist_video_id( url )
+    This function extracts the video ID from the given URL and performs
+    the specified action (add or delete) on Rumble's playlist. It then
+    notifies the user about the result of the operation.
 
+    Parameters:
+    url (str): The URL of the video to be managed in the playlist.
+    action (str, optional): The action to perform on the playlist.
+                            Can be either "add" or "delete". Defaults to "add".
+
+    Returns:
+    None
+
+    Side Effects:
+    - Modifies the user's Rumble playlist.
+    - Displays a notification to the user about the result of the operation.
+    """
+
+    video_id = get_playlist_video_id(url)
     if video_id:
         if action == "add":
-            RUMBLE_USER.playlist_add_video( video_id )
+            RUMBLE_USER.playlist_add_video(video_id)
             message = "Added to playlist"
         else:
-            RUMBLE_USER.playlist_delete_video( video_id )
+            RUMBLE_USER.playlist_delete_video(video_id)
             message = "Deleted from playlist"
     else:
         if action == "add":
@@ -1299,11 +1316,38 @@ def playlist_manage( url, action="add" ):
         else:
             message = "Cannot delete from playlist"
 
-    notify( message, "Playlist" )
+    notify(message, "Playlist")
 
-def comments_show( url ):
+def comments_show(url):
+    """
+    Retrieve and display comments for a Rumble video in a modal window.
 
-    """ Retrieves and shows video's comments in a modal """
+    This function extracts the video ID from the provided URL, creates a modal
+    window to display the comments, and shows it to the user. If the video ID
+    cannot be extracted, it notifies the user that comments are unavailable.
+
+    Parameters:
+    url (str): The URL of the Rumble video for which to show comments.
+
+    Returns:
+    None
+
+    Side Effects:
+    - Opens a modal window displaying comments if the video ID is successfully extracted.
+    - Displays a notification if comments cannot be retrieved.
+
+    Raises:
+    No exceptions are explicitly raised, but underlying functions may raise exceptions.
+
+    Dependencies:
+    - get_video_id(): Function to extract the video ID from a URL.
+    - CommentWindow: Custom class for creating a comment display window.
+    - ADDON: Kodi Addon object for retrieving addon information.
+    - notify(): Function to display notifications to the user.
+
+    Usage:
+    comments_show('https://rumble.com/v1234-example-video')
+    """
 
     video_id = get_video_id( url )
 
