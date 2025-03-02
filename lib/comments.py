@@ -91,9 +91,21 @@ class CommentWindow(xbmcgui.WindowXML):
                 ccl.addItem(xbmcgui.ListItem(label="No Comments Found"))
 
     def get_comment_control_list(self):
+        """
+        Retrieves the comment control list from the window.
 
-        """ gets comment control list """
+        This method returns the control object responsible for displaying
+        the list of comments in the user interface. The control is identified
+        by the ID 1 in the window's XML layout.
 
+        Returns:
+            xbmcgui.ControlList: The control object for the comment list.
+
+        Note:
+            This method assumes that the comment list control has an ID of 1
+            in the window's XML definition. If the ID changes, this method
+            should be updated accordingly.
+        """
         return self.getControl(1)
 
     def create_list_item(self, comment_id, comment_author_name, comment_post_time_ago, comment):
