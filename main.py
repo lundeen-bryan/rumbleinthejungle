@@ -263,6 +263,38 @@ def get_image(data, image_id):
         image = ''
 
     return image
+def get_video_id(url):
+    """
+    Extracts the video ID from a Rumble video URL.
+
+    This function fetches the HTML content of the given Rumble video URL and uses
+    a regular expression to extract the video ID from the embed URL found in the page.
+
+    Args:
+        url (str): The Rumble video URL from which to extract the video ID.
+
+    Returns:
+        str or False: The extracted video ID if found, or False if no video ID could be extracted.
+
+    Raises:
+        Any exceptions raised by the request_get function (e.g., network errors).
+
+    Example:
+        >>> video_id = get_video_id("https://rumble.com/v2jqx56-example-video.html")
+        >>> print(video_id)
+        'v2jqx56'
+    """
+
+    data = request_get(url)
+
+    video_id = re.compile(
+        ',\"embedUrl\":\"' + BASE_URL + '/embed/(.*?)\/\",',
+        re.MULTILINE|re.DOTALL|re.IGNORECASE
+    ).findall(data)
+
+    if video_id:
+        return video_id[0]
+    return False
 
 
 
@@ -550,7 +582,6 @@ def get_video_id( url ):
 
     data = request_get(url)
 
-    # gets embed id from embed url
     video_id = re.compile(
         ',\"embedUrl\":\"' + BASE_URL + '/embed/(.*?)\/\",',
         re.MULTILINE|re.DOTALL|re.IGNORECASE
@@ -559,6 +590,8 @@ def get_video_id( url ):
     if video_id:
         return video_id[0]
     return False
+
+
 
 def get_playlist_video_id( url ):
 
