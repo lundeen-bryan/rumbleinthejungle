@@ -1364,14 +1364,47 @@ def comments_show(url):
         notify( "Cannot find comments", "Comments" )
 
 def main():
+# 📌  main_fnc 📝 🗑️
     """
-    Main method to start the plugin.
+    Main entry point for the Rumble video Kodi plugin.
+
+    This function serves as the central dispatcher for the plugin, handling various
+    operations based on the parameters passed to it. It processes user interactions
+    within the Kodi interface and routes them to the appropriate functionality.
+
+    The function performs the following main tasks:
+    1. Retrieves and processes plugin parameters.
+    2. Decodes URL-encoded parameter values.
+    3. Executes different actions based on the 'mode' parameter.
 
     Parameters:
-    params (dict): A dictionary containing the parameters passed to the plugin.
+    None explicitly, but it uses the following global or imported functions/variables:
+    - get_params(): Function to retrieve plugin parameters.
+    - urllib.parse.unquote_plus(): Function to decode URL-encoded strings.
+    - Various mode-specific functions (e.g., home_menu, search_menu, play_video, etc.)
 
     Returns:
     None
+
+    Mode Operations:
+    0: Display home menu
+    1: Display search menu
+    2: Perform search
+    3: Handle pagination
+    4: Play video
+    5-6: Manage favorites (add/remove)
+    7: Show favorites
+    8: Open addon settings
+    9: Import favorites
+    10: Reset login session
+    11: Subscribe to channel
+    12: Manage playlist
+    13: Show video comments
+    14: Test login
+
+    Note:
+    This function assumes the existence of various other functions and global variables
+    that are part of the larger plugin structure.
     """
 
     params = get_params()
