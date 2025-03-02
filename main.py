@@ -260,12 +260,22 @@ def pagination(url, page, cat, search=False):
 
 
 
-def get_image( data, image_id ):
+def get_image(data, image_id):
+    """
+    Method to get an image from scraped page's CSS from the image ID.
 
-    """ method to get an image from scraped page's CSS from the image ID """
+    Parameters:
+    data (str): The scraped HTML page content.
+    image_id (int): The ID of the image to find.
 
+    Returns:
+    str: The URL of the image if found, otherwise an empty string.
+
+    The function uses a regular expression to search for the CSS rule for the given image ID
+    and extracts the URL from the 'background-image' property.
+    """
     image_re = re.compile(
-        "i.user-image--img--id-" + str( image_id ) + ".+?{\s*background-image: url(.+?);",
+        "i.user-image--img--id-" + str(image_id) + ".+?{\s*background-image: url(.+?);",
         re.MULTILINE|re.DOTALL|re.IGNORECASE
     ).findall(data)
 
@@ -277,10 +287,18 @@ def get_image( data, image_id ):
     return image
 
 
-def list_rumble( url, cat ):
 
-    """ Method to get and display items from Rumble """
+def list_rumble(url, cat):
+    """
+    Method to get and display items from Rumble.
 
+    Parameters:
+    url (str): The URL from which to retrieve the items.
+    cat (str): The category of items to retrieve.
+
+    Returns:
+    int: The number of items retrieved and displayed.
+    """
     amount = 0
     headers = None
 
@@ -312,6 +330,7 @@ def list_rumble( url, cat ):
         amount = dir_list_create( data, cat, cat, False )
 
     return amount
+
 
 
 def dir_list_create( data, cat, video_type='video', search = False, play=0 ):
