@@ -1062,9 +1062,42 @@ def login_test():
         # No details detected
         notify( get_string(30203) )
 
-def subscribe( name, action ):
+def subscribe(name, action):
+    """
+    Attempt to subscribe or unsubscribe to a Rumble channel or user.
 
-    """ Attempts to (un)subscribe to rumble channel """
+    This function handles the process of subscribing or unsubscribing to a Rumble
+    channel or user. It checks for an active session, determines the action type
+    based on the name format, and performs the subscription action using the
+    RUMBLE_USER object.
+
+    Parameters:
+    name (str): The name of the channel or user to subscribe/unsubscribe to.
+                It should be in the format '/user/username' or '/c/channelname'.
+    action (str): The action to perform, either 'subscribe' or 'unsubscribe'.
+
+    Returns:
+    bool: True if the subscription action was successful, False otherwise.
+
+    Side Effects:
+    - Modifies the user's subscription status on Rumble.
+    - Displays a notification to the user about the action's result.
+
+    Raises:
+    No exceptions are explicitly raised, but JSON parsing errors may occur.
+
+    Dependencies:
+    - RUMBLE_USER: An object that handles Rumble user sessions and API interactions.
+    - notify: A function to display notifications to the user.
+    - json: Used to parse the API response.
+
+    Usage:
+    result = subscribe('/c/example_channel', 'subscribe')
+    if result:
+        print("Successfully subscribed to the channel")
+    else:
+        print("Failed to subscribe to the channel")
+    """
 
     # make sure we have a session
     if RUMBLE_USER.has_session():
