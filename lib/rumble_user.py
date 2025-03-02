@@ -1,8 +1,46 @@
+# Auto updated?
+#   Yes
+# Modified:
+#   Sunday, March 2, 2025 12:30:05 PM PST
+#
 """
-Rumble User Class
-Created by Azzy9
-Class to handle all the rumble subscription methods
+The snippet above is from an Ext from TheRepoClub called File Header Generator
+==========================================================================================
+Procedure: ......... rumble_user.py/Procedurename
+Description: ....... Provides `RumbleUser` class with methods to interact with Rumble's API.
+Version: ........... 1.0.0 - major.minor.patch
+Created: ........... 2025-03-02
+Updated: ........... 2025-03-02
+Installs to: ....... plugin.video.rumbleinthejungle/lib
+Compatibility: ..... XBMC, Kodi 16+
+Contact Author: .... lundeen-bryan
+Copyright:  ........ company © 2025. All rights reserved.
+Preconditions: ..... Need lib.general and lib.md5ex
+Calls To: .......... procedure
+Called By: ......... procedure
+Examples: .......... _
+ (1) from lib.rumble_user import RumbleUser
+     user = RumbleUser()
+     if user.has_login_details():
+        session = user.login()
+        # Now you can perform further operations with the user's session.
+Notes: ............. _
+ (1) Handles functionality such as:
+ - Checking if a user is logged in.
+ - Logging in a user.
+ - Getting the current user's details.
+ - Getting the current user's favorite videos.
+ - Getting the current user's subscriptions.
+ - Getting the current user's liked videos.
+ - Getting the current user's watched videos.
+ - Getting the current user's liked videos.
+ - Getting the current user's notifications.
+ - Getting the current user's history.
+ Originally part of the `Rumble` project by Azzy9, this version has been updated to improve
+ code clarity, documentation, and overall maintainability.
+===========================================================================================
 """
+
 
 import math
 import time
