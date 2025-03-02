@@ -89,28 +89,6 @@ def favorites_load(return_string=False):
     return []
 
 
-
-def to_unicode(text, encoding='utf-8', errors='strict'):
-    """
-    Forces text to unicode.
-
-    Converts bytes to unicode using the specified encoding and error handling.
-
-    Parameters:
-    text (str or bytes): The text to convert. If it's already a string, it's returned as is.
-    encoding (str, optional): The encoding to use for conversion. Default is 'utf-8'.
-    errors (str, optional): The error handling method. Default is 'strict'.
-
-    Returns:
-    str: The converted text as a unicode string.
-    """
-    if isinstance(text, bytes):
-        return text.decode(encoding, errors=errors)
-
-    return text
-
-
-
 def get_search_string(heading='', message=''):
     """
     Ask the user for a search string.
@@ -335,7 +313,19 @@ def list_rumble(url, cat):
 
 def dir_list_create( data, cat, video_type='video', search = False, play=0 ):
 
-    """ create and display dir list based upon type """
+    """
+    Create and display directory list based on the given type.
+
+    Parameters:
+    data (str): The HTML data containing the directory list items.
+    cat (str): The category of the directory list items.
+    video_type (str, optional): The type of the directory list items. Defaults to 'video'.
+    search (bool, optional): Whether the function is being used for searching. Defaults to False.
+    play (int, optional): The play mode for the directory list items. Defaults to 0.
+
+    Returns:
+    int: The number of directory list items created.
+    """
 
     amount = 0
 
