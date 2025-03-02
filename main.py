@@ -1,4 +1,31 @@
-# -*- coding: utf-8 -*-
+# Auto updated?
+#   Yes
+# Modified:
+#   Sunday, March 2, 2025 12:48:52 PM PST
+#
+"""
+The snippet above is from an Ext from TheRepoClub called File Header Generator
+==========================================================================================
+Module: ............ main.py/main
+Description: ....... Main entry point for the Rumble Video Kodi Plugin, handling parameter parsing and routing for video playback, search, favorites, user session management, and other plugin functionalities.
+Version: ........... 1.0.0 - major.minor.patch
+Created: ........... 2025-03-02
+Updated: ........... 2025-03-02
+Installs to: ....... plugin.video.rumbleinthejungle/
+Compatibility: ..... XBMC, Kodi 16+, Kodi 21 Omega
+Contact Author: .... lundeen-bryan
+Copyright:  ........ company © 2025. All rights reserved.
+Preconditions: ..... Requires Python 3.11+ and a Kodi environment with xbmc, xbmcplugin, xbmcgui, xbmcaddon, xbmcvfs; depends on auxiliary modules (lib.general, lib.rumble_user, lib.comments).
+Calls To: .......... Internal functions (home_menu, search_menu, play_video, etc.)
+Called By: ......... Kodi Plugin System
+Examples: .......... _
+ (1) When Kodi launches the plugin, main() is executed to dispatch the appropriate functionality based on URL parameters.
+Notes: ............. _
+ (1) This module integrates routing and dispatching for plugin operations such as search, favorites, video playback, and session management.
+ (2) Originally adapted from the Rumble project by Azzy9; updated for improved clarity, maintainability, and documentation.
+==========================================================================================
+"""
+
 import sys
 import re
 import os
