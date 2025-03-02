@@ -18,14 +18,55 @@ class CommentWindow(xbmcgui.WindowXML):
         self.refresh()
 
     def fetch_comment_list(self):
+        """
+        Fetches the list of comments for the current video from Rumble.
 
-        """ fetches comment list from rumble """
+        This method uses the RumbleUser instance to retrieve comments
+        associated with the video_id of the current CommentWindow instance.
 
-        return RUMBLE_USER.get_comments( self.video_id )
+        Returns:
+            list: A list of comment data. Each item in the list is expected
+                  to be a tuple containing various details about a comment,
+                  such as author name, comment text, post date, etc.
+
+        Note:
+            The actual structure of the returned data depends on the
+            implementation of the RUMBLE_USER.get_comments method.
+
+        Raises:
+            Any exceptions raised by RUMBLE_USER.get_comments will be
+            propagated to the caller.
+        """
+        return RUMBLE_USER.get_comments(self.video_id)
 
     def refresh(self):
+        """
+        Refreshes the comment list in the CommentWindow.
 
-        """ Refreshes comment list """
+        This method fetches the latest comments for the current video and updates
+        the comment control list in the UI. If comments are found, it populates
+        the list with individual comment items. If no comments are found, it
+        displays a "No Comments Found" message.
+
+        The method performs the following steps:
+        1. Retrieves the comment control list.
+        2. Fetches the latest comments using fetch_comment_list().
+        3. If comments are found:
+        - Iterates through each comment.
+        - Creates a list item for each comment with relevant information.
+        - Adds each list item to the comment control list.
+        4. If no comments are found and the list is empty:
+        - Adds a single item with the "No Comments Found" message.
+
+        Note:
+        - The comment data is expected to be a tuple containing various details
+        about each comment (e.g., author name, post time, comment text).
+        - This method assumes that self.get_comment_control_list(),
+        self.fetch_comment_list(), and self.create_list_item() are implemented.
+
+        Returns:
+            None
+        """
 
         ccl = self.get_comment_control_list()
 
