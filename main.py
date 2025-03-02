@@ -1136,9 +1136,40 @@ def subscribe(name, action):
     return False
 
 
-def add_dir( name, url, mode, images = {}, info_labels = {}, cat = '', folder=True, fav_context=False, play=0, subscribe_context=False ):
+def add_dir(name, url, mode, images={}, info_labels={}, cat='', folder=True, fav_context=False, play=0, subscribe_context=False):
+    """
+    Adds a directory item to the Kodi interface for the Rumble video addon.
 
-    """ Adds directory items """
+    This function creates and configures a ListItem object with the provided information,
+    sets up context menus, and adds the item to the Kodi interface.
+
+    Parameters:
+    name (str): The display name of the item.
+    url (str): The URL associated with the item.
+    mode (int): The mode number for the item's action.
+    images (dict): A dictionary containing 'thumb' and 'fanart' image URLs.
+    info_labels (dict): A dictionary of metadata labels for the item.
+    cat (str): The category of the item.
+    folder (bool): If True, the item is treated as a folder; otherwise, as a playable item.
+    fav_context (bool): If True, adds favorite-related context menu items.
+    play (int): Playback mode (0: not playable, 1: unknown, 2: playable).
+    subscribe_context (dict or bool): If dict, adds subscribe/unsubscribe context menu items.
+
+    The function performs the following main tasks:
+    1. Sets up artwork (thumbnail and fanart) for the item.
+    2. Builds a URL with the item's parameters.
+    3. Creates and configures a ListItem object.
+    4. Adds various context menu items based on the item type and user login status.
+    5. Handles favorites-related functionality.
+    6. Adds the configured item to the Kodi interface.
+
+    Note:
+    - This function relies on several global variables and functions (e.g., HOME_DIR, MEDIA_DIR, RUMBLE_USER).
+    - It uses Kodi-specific modules like xbmcgui and xbmcplugin.
+
+    Returns:
+    None
+    """
 
     art_dict = {
         'thumb': images.get( 'thumb', HOME_DIR + 'icon.png' ),
