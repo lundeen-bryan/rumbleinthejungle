@@ -1,12 +1,12 @@
 # Auto updated?
 #   Yes
 # Modified:
-#   Sunday, March 2, 2025 12:30:05 PM PST
+#   Sunday, March 2, 2025 12:40:10 PM PST
 #
 """
 The snippet above is from an Ext from TheRepoClub called File Header Generator
 ==========================================================================================
-Procedure: ......... rumble_user.py/Procedurename
+Procedure: ......... rumble_user.py
 Description: ....... Provides `RumbleUser` class with methods to interact with Rumble's API.
 Version: ........... 1.0.0 - major.minor.patch
 Created: ........... 2025-03-02
