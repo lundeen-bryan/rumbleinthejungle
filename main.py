@@ -58,6 +58,15 @@ def favorites_create():
 
     xbmc.sleep(1)
 
+def to_unicode( text, encoding='utf-8', errors='strict' ):
+
+    """ Forces text to unicode """
+
+    if isinstance(text, bytes):
+        return text.decode(encoding, errors=errors)
+
+    return text
+
 
 
 def favorites_load(return_string=False):
@@ -786,8 +795,39 @@ def search_items(url, cat):
 
 
 def favorites_show():
+    """
+    Displays the user's favorite items in the Kodi interface.
 
-    """  Displays favorites """
+    This function loads the user's favorites and creates a directory listing
+    for each favorite item. If favorites exist, it displays them as selectable
+    items in the Kodi interface. If no favorites are found, it shows a dialog
+    informing the user.
+
+    The function handles the following operations:
+    1. Loads favorite data using favorites_load().
+    2. Iterates through each favorite item if any exist.
+    3. Extracts relevant information for each favorite (name, URL, mode, images, etc.).
+    4. Adds each favorite as a directory item in the Kodi interface using add_dir().
+    5. Finalizes the directory listing or shows a "no favorites" dialog.
+
+    The function uses a try-except block to handle any exceptions that may occur
+    during the process, ensuring that the directory listing is properly ended
+    even if an error occurs.
+
+    Returns:
+        None
+
+    Raises:
+        No exceptions are raised explicitly, but any occurring exceptions
+        are caught and handled to ensure proper function termination.
+
+    Dependencies:
+        - favorites_load(): Function to load favorite data
+        - add_dir(): Function to add directory items to Kodi interface
+        - xbmcplugin.endOfDirectory(): Kodi function to finalize directory listing
+        - xbmcgui.Dialog().ok(): Kodi function to display dialog boxes
+        - get_string(): Function to retrieve localized strings
+    """
 
     data = favorites_load()
 
@@ -817,9 +857,31 @@ def favorites_show():
 
 
 def favorite_add(name, url, fav_mode, thumb, fanart, plot, cat, folder, play):
+    """
+    Add a new favorite item to the favorites list.
 
-    """ add favorite from name """
+    This function adds a new favorite item with the provided details to the favorites list.
+    It loads the existing favorites, appends the new item, and saves the updated list.
+    Finally, it notifies the user that the item has been added to favorites.
 
+    Parameters:
+    name (str): The name or title of the favorite item.
+    url (str): The URL associated with the favorite item.
+    fav_mode (int): The mode number for the favorite item.
+    thumb (str): The URL or path to the thumbnail image for the favorite.
+    fanart (str): The URL or path to the fanart image for the favorite.
+    plot (str): A brief description or plot summary of the favorite item.
+    cat (str): The category of the favorite item.
+    folder (str): A string indicating whether the item is a folder ('True' or 'False').
+    play (str): A string representing the play mode for the favorite item.
+
+    Returns:
+    None
+
+    Side effects:
+    - Updates the favorites file with the new item.
+    - Displays a notification to the user.
+    """
     data = favorites_load()
     data.append((name, url, fav_mode, thumb, fanart, plot, cat, folder, play))
     fav_file = open( favorites, 'w' )
@@ -827,6 +889,7 @@ def favorite_add(name, url, fav_mode, thumb, fanart, plot, cat, folder, play):
     fav_file.close()
 
     notify( get_string(30152), name, thumb )
+
 
 
 def favorite_remove( name ):
