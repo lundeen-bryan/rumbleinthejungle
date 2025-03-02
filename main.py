@@ -177,9 +177,19 @@ def home_menu():
 
 
 def search_menu():
+    """
+    Creates search menu.
 
-    """ Creates search menu """
+    This function generates a menu with search options for videos, channels, and users.
+    It adds three items to the menu: one for searching videos, one for searching channels,
+    and one for searching users. Each item is a directory that leads to a search page on Rumble.
 
+    Parameters:
+    None
+
+    Returns:
+    None
+    """
     # Search Video
     add_dir( get_string(30100), BASE_URL + '/search/video?q=', 2, { 'thumb': 'search.png' }, {}, 'video' )
     # Search Channel
@@ -188,6 +198,7 @@ def search_menu():
     add_dir( get_string(30102), BASE_URL + '/search/channel?q=', 2, { 'thumb': 'search.png' }, {}, 'user' )
 
     xbmcplugin.endOfDirectory(PLUGIN_ID)
+
 
 
 def pagination( url, page, cat, search=False ):
