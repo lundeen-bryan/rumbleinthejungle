@@ -892,10 +892,25 @@ def favorite_add(name, url, fav_mode, thumb, fanart, plot, cat, folder, play):
 
 
 
-def favorite_remove( name ):
+def favorite_remove(name):
+    """
+    Remove a favorite item from the favorites list based on its name.
 
-    """ remove favorite from name """
+    This function searches for a favorite item with the given name in the favorites list,
+    removes it if found, and updates the favorites file. It then notifies the user about
+    the removal.
 
+    Parameters:
+    name (str): The name of the favorite item to be removed.
+
+    Returns:
+    None
+
+    Note:
+    - This function currently loops through all favorites to find a match.
+    - Future improvements may include using a more unique identifier and a more
+      efficient removal method.
+    """
     # TODO: remove via something more unique instead
     # TODO: remove via a method that doesn't require to loop through all favorites
 
@@ -905,17 +920,44 @@ def favorite_remove( name ):
         for index in range(len(data)):
             if data[index][0] == name:
                 del data[index]
-                fav_file = open( favorites, 'w' )
+                fav_file = open(favorites, 'w')
                 fav_file.write(json.dumps(data))
                 fav_file.close()
                 break
 
-    notify( get_string(30154), name )
+    notify(get_string(30154), name)
 
 
 
 def favorites_import():
-    """ Due to plugin name change from original fork, the favorites will need to be imported """
+    """
+    Import favorites from the original 'plugin.video.rumble.matrix' addon to the current addon.
+
+    This function is designed to migrate user favorites after a plugin name change from the original fork.
+    It performs the following steps:
+    1. Prompts the user for confirmation before proceeding with the import.
+    2. Ensures the favorites directory for the current addon exists.
+    3. Attempts to locate and read the favorites file from the original addon.
+    4. If found, copies the content to the current addon's favorites file.
+    5. Notifies the user of the import result.
+
+    The function uses Kodi's xbmcgui, xbmcvfs, and os modules for dialog, file operations, and path handling.
+
+    Returns:
+        None
+
+    Side effects:
+        - May overwrite the current addon's favorites file.
+        - Displays Kodi dialog boxes and notifications.
+
+    Raises:
+        No exceptions are explicitly raised, but file I/O operations may raise exceptions.
+
+    Note:
+        This function assumes the existence of helper functions like favorites_create() and notify().
+        The 'favorites' variable should be defined elsewhere in the code, representing the path
+        to the current addon's favorites file.
+    """
 
     if not xbmcgui.Dialog().yesno(
         'Import Favorites',
