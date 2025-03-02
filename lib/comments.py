@@ -109,8 +109,33 @@ class CommentWindow(xbmcgui.WindowXML):
         return self.getControl(1)
 
     def create_list_item(self, comment_id, comment_author_name, comment_post_time_ago, comment):
+        """
+        Creates a ListItem object for a single comment to be displayed in the Kodi UI.
 
-        """ creates list that will view comment """
+        This method constructs a xbmcgui.ListItem object that represents a comment
+        in the Rumble video comments list. It sets the label of the ListItem using
+        the create_label method and stores additional comment data as properties
+        of the ListItem.
+
+        Args:
+            comment_id (str): The unique identifier of the comment.
+            comment_author_name (str): The name of the comment's author.
+            comment_post_time_ago (str): A string representing how long ago the comment was posted.
+            comment (str): The text content of the comment.
+
+        Returns:
+            xbmcgui.ListItem: A fully configured ListItem object representing the comment.
+
+        Note:
+            The created ListItem includes the following properties:
+            - 'id': The comment's unique identifier
+            - 'comment_author_name': The name of the comment's author
+            - 'comment_post_time_ago': When the comment was posted
+            - 'comment': The full text of the comment
+
+        These properties can be accessed later for refreshing the display or
+        handling user interactions with the comment item.
+        """
 
         line_item = xbmcgui.ListItem(
             label=self.create_label(
