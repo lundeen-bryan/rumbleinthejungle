@@ -990,16 +990,64 @@ def favorites_import():
 
 
 def login_session_reset():
+    """
+    Force a reset of the current Rumble user session.
 
-    """ Forces a rumble session reset """
+    This function performs the following actions:
+    1. Resets the session details for the current Rumble user.
+    2. Displays a notification to the user indicating that the session has been reset.
+
+    The function does not take any parameters and does not return any values.
+
+    Note:
+    - This function assumes the existence of a global RUMBLE_USER object with a
+      reset_session_details() method.
+    - It also assumes the availability of notify() and get_string() functions for
+      user notifications.
+
+    Usage:
+    Call this function when you need to forcibly clear the current user's session,
+    such as for logout operations or troubleshooting authentication issues.
+    """
 
     RUMBLE_USER.reset_session_details()
     # Session Reset
     notify( get_string(30200) )
 
 def login_test():
+    """
+    Reset the current session and test the Rumble user login.
 
-    """ Method that resets session, then tests the login """
+    This function performs the following steps:
+    1. Resets the current session details.
+    2. Checks if login details are available.
+    3. Attempts to log in if details are present.
+    4. Notifies the user of the login result.
+
+    The function uses the RUMBLE_USER object to manage session details and perform login operations.
+    It also uses the notify() function to display messages to the user.
+
+    Returns:
+        None
+
+    Side Effects:
+        - Resets the current user session.
+        - Displays a notification to the user about the login status.
+
+    Notifications:
+        - Login Success (string ID: 30201): Displayed when login is successful.
+        - Login Failed (string ID: 30202): Displayed when login fails.
+        - No details detected (string ID: 30203): Displayed when no login details are found.
+
+    Dependencies:
+        - RUMBLE_USER: An object with methods for managing user sessions and login.
+        - notify(): Function to display notifications to the user.
+        - get_string(): Function to retrieve localized string resources.
+
+    Usage:
+        This function is typically called to test user authentication or verify login status.
+        It can be used after changing login credentials or for troubleshooting login issues.
+    """
 
     RUMBLE_USER.reset_session_details()
 
