@@ -201,10 +201,19 @@ def search_menu():
 
 
 
-def pagination( url, page, cat, search=False ):
+def pagination(url, page, cat, search=False):
+    """
+    List directory items and show pagination.
 
-    """ list directory items then show pagination """
+    Parameters:
+    url (str): The base URL for the directory.
+    page (int): The current page number.
+    cat (str): The category of the directory.
+    search (str, optional): The search string. Defaults to False.
 
+    Returns:
+    None. This function does not return any value.
+    """
     if url > '':
 
         page = int(page)
@@ -248,6 +257,7 @@ def pagination( url, page, cat, search=False ):
             xbmcplugin.addDirectoryItem(PLUGIN_ID, link, list_item, True)
 
     xbmcplugin.endOfDirectory(PLUGIN_ID)
+
 
 
 def get_image( data, image_id ):
