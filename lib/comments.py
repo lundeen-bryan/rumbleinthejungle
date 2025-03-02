@@ -37,7 +37,13 @@ class CommentWindow(xbmcgui.WindowXML):
             Any exceptions raised by RUMBLE_USER.get_comments will be
             propagated to the caller.
         """
-        return RUMBLE_USER.get_comments(self.video_id)
+        try:
+            return RUMBLE_USER.get_comments(self.video_id)
+        except Exception as e:
+            xbmc.log(f"Error fetching comments: {str(e)}", level=xbmc.LOGERROR)
+            # notify the user via UI
+            xbmcgui.Dialog().notification("Error", "Failed to fetch comments. Please try again later.", xbmcgui.NOTIFICATION)
+            return []
 
     def refresh(self):
         """
