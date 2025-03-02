@@ -1,0 +1,92 @@
+# Module Changes Documentation: Rumble Comments Utility
+
+## Overview
+
+This document explains the enhancements made to the lib/comments.py module. The changes improve error handling, refactor the comment data structure using a dataclass, and convert raw tuple data into structured Comment objects. These updates enhance code readability, maintainability, and robustness within the Kodi add-on.
+
+Changes and Rationale
+
+### 1. Enhanced Error Handling in fetch_comment_list
+
+- Before:
+The method directly called RUMBLE_USER.get_comments without any error handling. This could lead to unhandled exceptions in cases of network issues or unexpected response data.
+
+- After:
+A try/except block was added to catch any exceptions during the API call. If an error occurs, it is logged using xbmc.log, and the user is notified via a UI dialog.
+
+*Benefits:*
+
+- Robustness: Prevents crashes by gracefully handling errors.
+- User Feedback: Notifies the user when something goes wrong, enhancing user experience.
+
+#### Code Snippet for fetch_comment
+
+```python
+def fetch_comment_list(self):
+    try:
+        raw_comments = RUMBLE_USER.get_comments(self.video_id)
+        # Convert the raw comments into Comment objects
+        comments = [Comment(*comment_data) for comment_data in raw_comments]
+        return comments
+    except Exception as e:
+        xbmc.log(f"Error fetching comments: {str(e)}", level=xbmc.LOGERROR)
+        xbmcgui.Dialog().notification("Error", "Failed to fetch comments. Please try again later.", xbmcgui.NOTIFICATION)
+        return []
+```
+
+### 2. Refactored Comment Data Structure Using a Dataclass
+
+- Before:
+Comment data was expected to be a raw tuple, making it harder to understand which element represented which piece of information.
+
+- After:
+A Comment dataclass was introduced to encapsulate comment properties such as author_url, author_name, comment_id, and so on. This makes the code more self-documenting and simplifies future modifications.
+
+*Benefits:*
+
+- Clarity: Named fields improve readability over tuple indices.
+- Maintainability: Centralizes comment-related properties in a single structure.
+
+#### Code Snippet for dataclasses
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class Comment:
+    author_url: str
+    author_name: str
+    comment_id: str
+    post_day: str
+    post_month: str
+    post_date: str
+    post_year: str
+    post_hour: str
+    post_minute: str
+    post_meridiem: str
+    post_time_ago: str
+    comment_text: str
+```
+
+### 3. Conversion of Raw Tuple Data to Comment Instances
+
+- Before:
+The module expected the raw data from RUMBLE_USER.get_comments to be tuples, and later attempted to access attributes (like comment.comment_id) that tuples do not provide.
+
+- After:
+Each tuple returned from RUMBLE_USER.get_comments is converted into a Comment instance. This ensures that the rest of the code can safely access properties by name.
+
+*Benefits:*
+
+- Data Consistency: All comment data is uniformly handled as Comment objects.
+- Error Reduction: Eliminates issues related to tuple unpacking and attribute access.
+- Implementation:
+The conversion is done in the fetch_comment_list method as shown in the snippet from the enhanced error handling section above.
+
+## Final Implementation Overview
+
+The updated module now:
+
+- Retrieves comment data from Rumble via the RumbleUser API with robust error handling.
+- Uses a structured data type (Comment dataclass) to encapsulate comment details.
+- Converts raw tuple data into Comment instances, allowing the UI logic to access comment attributes reliably.

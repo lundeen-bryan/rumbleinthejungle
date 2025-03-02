@@ -1,12 +1,30 @@
+# 📌  comments_todo 📝 🗑️
+
 import xbmc
 import xbmcgui
-
 import requests
 
 from lib.general import *
 from lib.rumble_user import RumbleUser
+from dataclasses import dataclass
 
 RUMBLE_USER = RumbleUser()
+
+@dataclass
+class Comment:
+    author_url: str
+    author_name: str
+    comment_id: str
+    post_day: str
+    post_month: str
+    post_date: str
+    post_year: str
+    post_hour: str
+    post_minute: str
+    post_meridiem: str
+    post_time_ago: str
+    comment_text: str
+
 
 class CommentWindow(xbmcgui.WindowXML):
 
@@ -38,7 +56,10 @@ class CommentWindow(xbmcgui.WindowXML):
             propagated to the caller.
         """
         try:
-            return RUMBLE_USER.get_comments(self.video_id)
+            raw_comments = RUMBLE_USER.get_comments(self.video_id)
+            # Convert the raw comments into Comment objects
+            comments = [Comment(*comment_data) for comment_data in raw_comments]
+            return comments
         except Exception as e:
             xbmc.log(f"Error fetching comments: {str(e)}", level=xbmc.LOGERROR)
             # notify the user via UI
@@ -79,19 +100,16 @@ class CommentWindow(xbmcgui.WindowXML):
         results = self.fetch_comment_list()
 
         if results:
-            for comment_author_url, comment_author_name, comment_id, \
-                comment_post_day, comment_post_month, comment_post_date, comment_post_year, \
-                comment_post_hour, comment_post_minute, comment_post_meridiem, \
-                comment_post_time_ago, comment in results:
-
+            for comment in results:
                 ccl.addItem(
                     self.create_list_item(
-                        comment_id,
-                        comment_author_name,
-                        comment_post_time_ago,
-                        comment
+                        comment.comment_id,
+                        comment.author_name,
+                        comment.post_time_ago,
+                        comment.comment_text
                     )
                 )
+
         else:
             if ccl.size() == 0:
                 ccl.addItem(xbmcgui.ListItem(label="No Comments Found"))
