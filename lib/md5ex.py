@@ -86,40 +86,47 @@ class MD5Ex:
 
         return g
 
-    def encUTF8( self, n ):
-
+    def encUTF8(self, n: str) -> str:
         """ encUTF8 method """
 
-        # return string
-        r_str = ''
+        # return list
+        r_list: List[int] = []
         # character pos
-        char_pos = 0
+        char_pos: int = 0
         # string length
-        str_len = len(n) - 1
+        str_len: int = len(n) - 1
 
         while char_pos <= str_len:
-
-            h = self.char_code_at(n, char_pos)
+            h: int = self.char_code_at(n, char_pos)
             char_pos += 1
-            i = self.char_code_at(n, char_pos)
+            i: int = self.char_code_at(n, char_pos)
 
-            if char_pos < str_len and 55296 <= h and h <= 56319 and 56320 <= i and i <= 57343:
+            if char_pos < str_len and 55296 <= h <= 56319 and 56320 <= i <= 57343:
                 h = 65536 + self.bit_shift((1023 & h), 10, 'l') + (1023 & i)
-                char_pos +=1
+                char_pos += 1
 
             if h <= 127:
-                r_str += chr(h)
-            else:
-                if h <= 2047:
-                    r_str += chr(192 | self.bit_shift( h, 6, 'r', True ) & 31, 128 | 63 & h)
-                else:
-                    if h <= 65535:
-                        r_str += chr(224 | self.bit_shift( h, 12, 'r', True ) & 15, 128 | self.bit_shift( h, 6, 'r', True ) & 63, 128 | 63 & h)
-                    else:
-                        if h <= 2097151:
-                            r_str += chr(240 | self.bit_shift( h, 18, 'r', True ) & 7, 128 | self.bit_shift( h, 12, 'r', True ) & 63, 128 | self.bit_shift( h, 6, 'r', True ) & 63, 128 | 63 & h)
+                r_list.append(h)
+            elif h <= 2047:
+                r_list.extend([
+                    192 | self.bit_shift(h, 6, 'r', True) & 31,
+                    128 | 63 & h
+                ])
+            elif h <= 65535:
+                r_list.extend([
+                    224 | self.bit_shift(h, 12, 'r', True) & 15,
+                    128 | self.bit_shift(h, 6, 'r', True) & 63,
+                    128 | 63 & h
+                ])
+            elif h <= 2097151:
+                r_list.extend([
+                    240 | self.bit_shift(h, 18, 'r', True) & 7,
+                    128 | self.bit_shift(h, 12, 'r', True) & 63,
+                    128 | self.bit_shift(h, 6, 'r', True) & 63,
+                    128 | 63 & h
+                ])
 
-        return r_str
+        return ''.join(chr(byte) for byte in r_list)
 
     def strBin( self, n ):
 
