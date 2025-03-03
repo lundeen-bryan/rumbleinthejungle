@@ -1,3 +1,28 @@
+# Auto updated?
+#   Yes
+# Modified:
+#   Sunday, March 2, 2025 5:01:08 PM PST
+#
+"""
+The snippet above is from an Ext from TheRepoClub called File Header Generator
+==========================================================================================
+Procedure: ......... comments.py
+Description: ....... manage and document comments for the plugin.video.rumbleinthejungle library.
+Version: ........... 1.0.0 - major.minor.patch
+Created: ........... 2025-03-02
+Updated: ........... 2025-03-02
+Module URL: ........ weburl
+Installs to: ....... plugin.video.rumbleinthejungle/lib
+Compatibility: ..... XBMC, Kodi 16+, Kodi 21 Omega
+Contact Author: .... lundeen-bryan
+Copyright:  ........ n/a © 2025. All rights reserved.
+Preconditions: ..... xbmc, xbmcplugin, xbmcgui, xbmcaddon, xbmcvfs; depends on auxiliary modules (lib.general, lib.rumble_user).
+Examples: .......... _
+ (1)
+Notes: ............. _
+ (1)
+===========================================================================================
+"""
 # 📌  comments_todo 📝 🗑️
 
 import xbmc
