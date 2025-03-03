@@ -1,4 +1,27 @@
-# -*- coding: utf-8 -*-
+# Auto updated?
+#   Yes
+# Modified:
+#   Sunday, March 2, 2025 7:45:20 PM PST
+#
+"""
+The snippet above is from an Ext from TheRepoClub called File Header Generator
+==========================================================================================
+Procedure: ......... general.py
+Description: ....... Provides utility functions for Kodi add-ons to hanlde HTTP requests, URL building, notifications, localization, and video metadata management.
+Version: ........... 1.0.0 - major.minor.patch
+Created: ........... 2025-03-02
+Updated: ........... 2025-03-02
+Installs to: ....... plugin.video.rumbleinthejungle/lib
+Compatibility: ..... Kodi 16+
+Contact Author: .... lundeen-bryan
+Copyright:  ........ n/a © 2025. All rights reserved.
+Preconditions: ..... Must be running within a Kodi add-on environment (Kodi 21 Omega or compatible) on Python 3.11+ with Kodi modules (xbmc, xbmcgui, xbmcplugin, xbmcaddon), requests, six installed, and proper add-on settings configured.
+Notes: ............. _
+ (1) notes_here
+# 📌  module notes.md 📝 🗑️
+
+===========================================================================================
+"""
 import sys
 import requests
 from datetime import datetime, timedelta
