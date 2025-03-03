@@ -4,6 +4,9 @@ Converted from JS to python by Azzy9
 This is a class to generate hashes that is used by the Rumble platform to login
 """
 
+from typing import Union
+import xbmc
+
 class MD5Ex:
 
     """ MD5Ex class to create MD5 hashes """
@@ -22,14 +25,22 @@ class MD5Ex:
 
         return val1 >> val2
 
-    def char_code_at( self, str_in, pos ):
+    def char_code_at(self, str_in: str, pos: int) -> int:
+        """
+        Get the Unicode code point of a character at a specific position in a string.
 
-        """ essentially the ord method but with validation that is required """
+        Args:
+            str_in (str): The input string.
+            pos (int): The position of the character in the string.
 
-        if pos < len( str_in ):
-            return ord( str_in[pos] )
-
-        return 0
+        Returns:
+            int: The Unicode code point of the character, or 0 if the position is out of bounds.
+        """
+        try:
+            return ord(str_in[pos])
+        except IndexError:
+            xbmc.log(f"IndexError in char_code_at: pos {pos} out of range for string of length {len(str_in)}", xbmc.LOGDEBUG)
+            return 0
 
     def hash( self, n ):
 
