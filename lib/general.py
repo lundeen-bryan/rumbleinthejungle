@@ -30,9 +30,27 @@ requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 reqs = requests.session()
 
-def request_get( url, data=None, extra_headers=None ):
+def request_get(url, data=None, extra_headers=None):
+    """
+    Makes an HTTP GET or POST request to the specified URL.
 
-    """ makes a request """
+    This function handles setting up headers, managing cookies, and making the actual HTTP request.
+    It supports both GET and POST methods, and can handle additional custom headers.
+
+    Args:
+        url (str): The URL to make the request to.
+        data (dict, optional): Data to send in a POST request. If provided, a POST request is made;
+                               otherwise, a GET request is made. Defaults to None.
+        extra_headers (dict, optional): Additional headers to include in the request. Defaults to None.
+
+    Returns:
+        str: The text content of the response. Returns an empty string if an exception occurs.
+
+    Note:
+        - This function uses a predefined set of headers, including a specific User-Agent.
+        - It manages cookies across requests, storing them in the Kodi addon settings.
+        - The function has a timeout of 10 seconds for the request.
+    """
 
     try:
 
