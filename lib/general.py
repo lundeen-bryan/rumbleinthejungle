@@ -99,11 +99,26 @@ def request_get(url, data=None, extra_headers=None):
         return ''
 
 def build_url(query):
-
     """
-    Helper function to build a Kodi xbmcgui.ListItem URL
-    :param query: Dictionary of url parameters to put in the URL
-    :returns: A formatted and urlencoded URL string
+    Constructs a URL for Kodi xbmcgui.ListItem with encoded parameters.
+
+    This function takes a dictionary of URL parameters and builds a properly
+    formatted and URL-encoded string for use in Kodi. It handles encoding of
+    both string and non-string values, ensuring compatibility with Kodi's
+    expectations.
+
+    Args:
+        query (dict): A dictionary containing key-value pairs to be included
+                      as URL parameters.
+
+    Returns:
+        str: A formatted URL string with encoded parameters, ready for use
+             in Kodi xbmcgui.ListItem.
+
+    Example:
+        params = {'action': 'play', 'video_id': '12345'}
+        url = build_url(params)
+        # Result: 'plugin://your.addon.id/?action=play&video_id=12345'
     """
 
     return (PLUGIN_URL + '?' + urllib.parse.urlencode({
