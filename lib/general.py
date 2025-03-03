@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 import sys
 import requests
-from datetime import datetime
+from datetime import datetime, timedelta
+
 
 import xbmc
 import xbmcaddon
@@ -229,26 +230,54 @@ def get_date_formatted(format_id, year, month, day):
     return date.strftime('%Y/%m/%d')
 
 
-def duration_to_secs( duration, fail_return = '' ):
+def duration_to_secs(duration, fail_return=''):
+    """
+    Convert a duration string to seconds.
 
-    """ converts video duration to seconds """
+    This function takes a duration string in various formats and converts it to seconds.
+    It supports formats like "HH:MM:SS", "MM:SS", or just seconds as a string.
 
-    if duration:
+    Args:
+        duration (str): A string representing the duration. Can be in the format
+                        "HH:MM:SS", "MM:SS", or just seconds.
+        fail_return (str, optional): The value to return if conversion fails.
+                                     Defaults to an empty string.
+
+    Returns:
+        str: The duration converted to seconds as a string. If conversion fails
+             or the input is invalid, returns the value of `fail_return`.
+
+    Examples:
+        >>> duration_to_secs("01:30:45")
+        '5445'
+        >>> duration_to_secs("45:30")
+        '2730'
+        >>> duration_to_secs("3600")
+        '3600'
+        >>> duration_to_secs("invalid", "0")
+        '0'
+
+    Note:
+        - For "HH:MM:SS" or "MM:SS" formats, it uses timedelta to calculate total seconds.
+        - For input that's already in seconds, it simply returns that value as a string.
+        - If the input is empty or conversion fails, it returns the `fail_return` value.
+    """
+
+    if not duration:
+        return fail_return
+
+    try:
         if ':' in duration:
-
-            time_element_amount = len( duration.split( ':' ) )
-
-            # ensure time string is complete
-            if time_element_amount == 2:
-                duration = '0:' + duration
-
-            h, m, s = duration.split(':')
-            return str( int(h) * 3600 + int(m) * 60 + int(s) )
+            parts = duration.split(':')
+            if len(parts) == 2:
+                parts.insert(0, '0')  # Add 0 hours if only minutes and seconds
+            h, m, s = map(int, parts)
+            return str(int(timedelta(hours=h, minutes=m, seconds=s).total_seconds()))
         else:
             # should only be seconds
-            return duration
-
-    return fail_return
+            return str(int(duration))
+    except ValueError:
+        return fail_return
 
 def get_params():
 
