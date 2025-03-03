@@ -128,9 +128,28 @@ def build_url(query):
     }))
 
 
-def notify( message, name=False, iconimage=False, time_shown=5000 ):
+def notify(message, name=False, iconimage=False, time_shown=5000):
+    """
+    Display a notification to the user in the Kodi interface.
 
-    """ Show notification to user """
+    This function shows a notification with customizable title, message, icon, and duration.
+    If the title or icon is not provided, it uses default values from the addon settings.
+
+    Args:
+        message (str): The main content of the notification.
+        name (str, optional): The title of the notification.
+            Defaults to the addon name if not provided.
+        iconimage (str, optional): The path to the icon image for the notification.
+            Defaults to the addon icon if not provided.
+        time_shown (int, optional): The duration to display the notification, in milliseconds.
+            Defaults to 5000 (5 seconds).
+
+    Returns:
+        None
+
+    Example:
+        notify("Video started playing", "Now Playing", time_shown=3000)
+    """
 
     if not name:
         name = ADDON_NAME
