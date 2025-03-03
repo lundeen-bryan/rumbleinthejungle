@@ -280,9 +280,35 @@ def duration_to_secs(duration, fail_return=''):
         return fail_return
 
 def get_params():
+    """
+    Extract and parse URL parameters from the Kodi addon request.
 
-    """ gets params from request """
+    This function retrieves the URL query string from sys.argv[2], which is
+    typically where Kodi passes the addon's URL parameters. It then parses
+    this string into a dictionary of key-value pairs.
 
+    Returns:
+        dict: A dictionary containing the parsed URL parameters.
+              Keys are parameter names, and values are parameter values.
+              Empty values are retained in the dictionary.
+
+    Example:
+        If the addon is called with a URL like:
+        'plugin://your.addon.id/?action=play&video_id=12345&quality='
+
+        The function will return:
+        {
+            'action': 'play',
+            'video_id': '12345',
+            'quality': ''
+        }
+
+    Note:
+        - The function assumes that sys.argv[2] contains the URL query string.
+        - The leading '?' character of the query string is stripped before parsing.
+        - This function is specifically designed for use in Kodi addons and may not
+          work as expected in other contexts.
+    """
     return dict(urllib.parse.parse_qsl(sys.argv[2][1:], keep_blank_values=True))
 
 def clean_text( text ):
