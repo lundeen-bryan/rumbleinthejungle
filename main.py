@@ -1,7 +1,7 @@
 # Auto updated?
 #   Yes
 # Modified:
-#   Sunday, March 2, 2025 12:48:52 PM PST
+#   Sunday, March 2, 2025 8:14:10 PM PST
 #
 """
 The snippet above is from an Ext from TheRepoClub called File Header Generator
@@ -709,7 +709,7 @@ def resolver(url):
             # m3u8 check
             if len( urls ) == 1 and '.m3u8' in urls[0][1]:
                 from lib.m3u8 import m3u8
-                m3u8_handler = m3u8()
+                m3u8_handler = M3U8Processor()
                 urls = m3u8_handler.process( request_get( urls[0][1] ) )
 
             # reverses array - small to large
