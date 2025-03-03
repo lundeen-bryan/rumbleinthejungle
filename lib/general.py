@@ -3,6 +3,8 @@ import sys
 import requests
 from datetime import datetime, timedelta
 
+import html
+
 
 import xbmc
 import xbmcaddon
@@ -311,23 +313,35 @@ def get_params():
     """
     return dict(urllib.parse.parse_qsl(sys.argv[2][1:], keep_blank_values=True))
 
-def clean_text( text ):
+def clean_text(text):
+    """
+    Clean and sanitize the input text by removing problematic characters and converting HTML entities.
 
-    """ Removes characters that can cause trouble """
+    This function performs the following operations:
+    1. Strips leading and trailing whitespace.
+    2. Unescapes HTML entities using html.unescape().
 
-    if six.PY2:
-        # Python 2 Fix
-        # TODO: Provide a proper fix that doesn't revolve removing characters
-        text = text.encode('ascii', 'ignore').decode('ascii')
+    Args:
+        text (str): The input text to be cleaned.
 
+    Returns:
+        str: The cleaned and sanitized text.
+
+    Note:
+        - This function is designed for Python 3.11+ and Kodi 21 Omega.
+        - It uses html.unescape() to handle all HTML entities, not just a limited set.
+
+    Examples:
+        >>> clean_text("  Hello &amp; World!  ")
+        'Hello & World!'
+        >>> clean_text("Quote: &#34;Hello&#39;&amp;&#39;World&#34;")
+        'Quote: "Hello\'&\'World"'
+    """
+    # Strip whitespace
     text = text.strip()
 
-    if r'&' in text:
-        text = text.replace(r'&amp;', r'&')
-
-        if r'&#' in text:
-            # replace common ascii codes, will expand if needed
-            text = text.replace(r'&#34;', r'"').replace(r'&#38;', r'&').replace(r'&#39;', r"'")
+    # Unescape HTML entities
+    text = html.unescape(text)
 
     return text
 
