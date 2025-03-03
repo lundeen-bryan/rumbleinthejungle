@@ -159,13 +159,34 @@ def notify(message, name=False, iconimage=False, time_shown=5000):
 
     xbmc.executebuiltin('Notification(%s, %s, %d, %s)' % (name, message, time_shown, iconimage))
 
-def get_string( string_id ):
+def get_string(string_id):
+    """
+    Retrieves a localized language string based on the provided string ID.
 
-    """ gets language string based upon id """
+    This function handles both addon-specific strings and Kodi's built-in strings.
+    For addon-specific strings (IDs >= 30000), it uses the addon's localization system.
+    For Kodi's built-in strings (IDs < 30000), it uses Kodi's global localization system.
 
+    Args:
+        string_id (int): The ID of the desired language string.
+
+    Returns:
+        str: The localized string corresponding to the given string_id.
+
+    Note:
+        - Addon-specific strings typically use IDs starting from 30000 to avoid
+          conflicts with Kodi's built-in string IDs.
+        - The addon's localization strings should be defined in the addon's
+          language files (e.g., resources/language/resource.language.en_gb/strings.po).
+
+    Example:
+        localized_string = get_string(30001)  # Retrieves addon-specific string
+        kodi_string = get_string(13)  # Retrieves a Kodi built-in string
+    """
     if string_id >= 30000:
-        return __language__( string_id )
-    return xbmc.getLocalizedString( string_id )
+        return __language__(string_id)
+    return xbmc.getLocalizedString(string_id)
+
 
 def get_date_formatted( format_id, year, month, day ):
 
