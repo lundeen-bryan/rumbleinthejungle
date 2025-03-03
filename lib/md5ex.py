@@ -87,7 +87,34 @@ class MD5Ex:
         return g
 
     def encUTF8(self, n: str) -> str:
-        """ encUTF8 method """
+        """
+        Encode a string to UTF-8.
+
+        This method implements a custom UTF-8 encoding algorithm. It processes each character
+        in the input string and converts it to its UTF-8 representation. The method handles
+        Unicode code points up to U+1FFFFF (the maximum code point in UTF-8).
+
+        Args:
+            n (str): The input string to be encoded to UTF-8.
+
+        Returns:
+            str: The UTF-8 encoded string.
+
+        Note:
+            This method handles surrogate pairs for characters outside the Basic Multilingual Plane.
+            It uses bitwise operations to construct the UTF-8 byte sequences.
+
+        UTF-8 Encoding Scheme used:
+        - U+0000 to U+007F: 1 byte  (ASCII characters)
+        - U+0080 to U+07FF: 2 bytes
+        - U+0800 to U+FFFF: 3 bytes
+        - U+10000 to U+1FFFFF: 4 bytes
+
+        Example:
+            >>> md5ex = MD5Ex()
+            >>> md5ex.encUTF8("Hello, 世界")
+            'Hello, \xe4\xb8\x96\xe7\x95\x8c'
+        """
 
         # return list
         r_list: List[int] = []
