@@ -5,8 +5,9 @@ from datetime import datetime, timedelta
 
 import html
 
-
+import xbmcgui
 import xbmc
+import xbmcplugin
 import xbmcaddon
 
 import six
@@ -345,34 +346,33 @@ def clean_text(text):
 
     return text
 
-def item_set_info( line_item, properties ):
+def item_set_info(line_item: xbmcgui.ListItem, properties: dict) -> None:
+    """Set video information properties on a Kodi ListItem object.
 
-    """ line item set info """
-
+    Args:
+        line_item (xbmcgui.ListItem): The Kodi ListItem object to update.
+        properties (dict): A dictionary containing video information properties.
+    """
     if KODI_VERSION > 19.8:
         vidtag = line_item.getVideoInfoTag()
-        if properties.get( 'year' ):
-            vidtag.setYear( int( properties.get( 'year' ) ) )
-        if properties.get( 'episode' ):
-            vidtag.setEpisode( properties.get( 'episode' ) )
-        if properties.get( 'season' ):
-            vidtag.setSeason( properties.get( 'season' ) )
-        if properties.get( 'plot' ):
-            vidtag.setPlot( properties.get( 'plot' ) )
-        if properties.get( 'title' ):
-            vidtag.setTitle( properties.get( 'title' ) )
-        if properties.get( 'studio' ):
-            vidtag.setStudios([ properties.get( 'studio' ) ])
-        if properties.get( 'writer' ):
-            vidtag.setWriters([ properties.get( 'writer' ) ])
-        if properties.get( 'duration' ):
-            vidtag.setDuration( int( properties.get( 'duration' ) ) )
-        if properties.get( 'tvshowtitle' ):
-            vidtag.setTvShowTitle( properties.get( 'tvshowtitle' ) )
-        if properties.get( 'mediatype' ):
-            vidtag.setMediaType( properties.get( 'mediatype' ) )
-        if properties.get('premiered'):
-            vidtag.setPremiered( properties.get( 'premiered' ) )
 
+        # Use a mapping of property names to setter methods
+        setters = {
+            'year': lambda x: vidtag.setYear(int(x)),
+            'episode': vidtag.setEpisode,
+            'season': vidtag.setSeason,
+            'plot': vidtag.setPlot,
+            'title': vidtag.setTitle,
+            'studio': lambda x: vidtag.setStudios([x]),
+            'writer': lambda x: vidtag.setWriters([x]),
+            'duration': lambda x: vidtag.setDuration(int(x)),
+            'tvshowtitle': vidtag.setTvShowTitle,
+            'mediatype': vidtag.setMediaType,
+            'premiered': vidtag.setPremiered,
+        }
+
+        # Use dictionary comprehension with generator expression
+        {setter(value) for key, (setter, value)
+         in ((k, (setters[k], v)) for k, v in properties.items() if k in setters)}
     else:
         line_item.setInfo('video', properties)
