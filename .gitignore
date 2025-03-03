@@ -7,4 +7,4 @@
 /.mypy_cache
 /.vscode
 package_addon.py
-lib/__pycache__/comments.cpython-38.opt-1.pyc
+__pycache__/
