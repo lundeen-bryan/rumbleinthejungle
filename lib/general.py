@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import sys
 import requests
+from datetime import datetime
 
 import xbmc
 import xbmcaddon
@@ -188,15 +189,45 @@ def get_string(string_id):
     return xbmc.getLocalizedString(string_id)
 
 
-def get_date_formatted( format_id, year, month, day ):
+def get_date_formatted(format_id, year, month, day):
+    """
+    Format a date string based on the specified format ID.
 
-    """ puts date into format based upon setting """
+    This function takes individual components of a date (year, month, day) and
+    formats them into a string according to the specified format_id.
 
+    Args:
+        format_id (str): A string indicating the desired date format.
+            '1' for MM/DD/YYYY
+            '2' for DD/MM/YYYY
+            Any other value for YYYY/MM/DD
+        year (str): The year component of the date.
+        month (str): The month component of the date.
+        day (str): The day component of the date.
+
+    Returns:
+        str: A formatted date string according to the specified format_id.
+
+    Examples:
+        >>> get_date_formatted('1', '2023', '12', '31')
+        '12/31/2023'
+        >>> get_date_formatted('2', '2023', '12', '31')
+        '31/12/2023'
+        >>> get_date_formatted('3', '2023', '12', '31')
+        '2023/12/31'
+    """
+
+    date = datetime(
+        int(year),
+        int(month),
+        int(day)
+    )
     if format_id == '1':
-        return month + '/' + day + '/' + year
+        return date.strftime('%m/%d/%Y')
     if format_id == '2':
-        return day + '/' + month + '/' + year
-    return year + '/' + month + '/' + day
+        return date.strftime('%d/%m/%Y')
+    return date.strftime('%Y/%m/%d')
+
 
 def duration_to_secs( duration, fail_return = '' ):
 
