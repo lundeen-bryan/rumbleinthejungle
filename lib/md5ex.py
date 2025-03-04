@@ -6,24 +6,58 @@ This is a class to generate hashes that is used by the Rumble platform to login
 
 from typing import Union
 import xbmc
+from typing import Literal
+
 
 class MD5Ex:
+    """MD5Ex class to create MD5 hashes"""
 
-    """ MD5Ex class to create MD5 hashes """
+    hex = [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "a",
+        "b",
+        "c",
+        "d",
+        "e",
+        "f",
+    ]
 
-    hex = [ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' ]
+    def bit_shift(
+        self,
+        value: int,
+        shift_amount: int,
+        direction: Literal["r", "l"] = "r",
+        zero_fill: bool = False,
+    ) -> int:
+        """
+        Perform a bitwise shift operation on the given value.
 
-    def bit_shift( self, val1, val2, direction = 'r', zero_fill = False ):
+        Args:
+            value (int): The integer value to be shifted.
+            shift_amount (int): The number of positions to shift the bits.
+            direction (Literal["r", "l"]): The direction of the shift ('r' for right, 'l' for left).
+            zero_fill (bool): If True, perform a zero-filled right shift.
 
-        """ bit_shift method to allow zero filled bitshift which is not supported by python """
+        Returns:
+            int: The result of the bitwise shift operation.
+        """
 
-        if direction == 'l':
-            return val1 << val2
+        if direction == "l":
+            return value << shift_amount
 
-        if direction == 'r' and zero_fill is True:
-            return (val1 % 0x100000000) >> val2
+        if direction == "r" and zero_fill is True:
+            return (value % 0x100000000) >> shift_amount
 
-        return val1 >> val2
+        return value >> shift_amount
 
     def char_code_at(self, str_in: str, pos: int) -> int:
         """
@@ -39,42 +73,39 @@ class MD5Ex:
         try:
             return ord(str_in[pos])
         except IndexError:
-            xbmc.log(f"IndexError in char_code_at: pos {pos} out of range for string of length {len(str_in)}", xbmc.LOGDEBUG)
+            xbmc.log(
+                f"IndexError in char_code_at: pos {pos} out of range for string of length {len(str_in)}",
+                xbmc.LOGDEBUG,
+            )
             return 0
 
-    def hash( self, n ):
+    def hash(self, n):
+        """hash method"""
 
-        """ hash method """
+        return self.binHex(self.binHash(self.strBin(n), len(n) << 3))
 
-        return self.binHex( self.binHash( self.strBin(n), len(n) << 3))
-
-    def hashUTF8( self, n ):
-
-        """ hashUTF8 method """
+    def hashUTF8(self, n):
+        """hashUTF8 method"""
 
         return self.hash(self.encUTF8(n))
 
-    def hashRaw( self, n ):
-
-        """ hashRaw method """
+    def hashRaw(self, n):
+        """hashRaw method"""
 
         return self.binStr(self.binHash(self.strBin(n), len(n) << 3))
 
-    def hashRawUTF8( self, n ):
-
-        """ hashRawUTF8 method """
+    def hashRawUTF8(self, n):
+        """hashRawUTF8 method"""
 
         return self.hashRaw(self.encUTF8(n))
 
-    def hashStretch( self, n, h, i ):
-
-        """ hashStretch method """
+    def hashStretch(self, n, h, i):
+        """hashStretch method"""
 
         return self.binHex(self.binHashStretch(n, h, i))
 
-    def binHashStretch( self, n, h, i ):
-
-        """ binHashStretch method """
+    def binHashStretch(self, n, h, i):
+        """binHashStretch method"""
 
         e = self.encUTF8(n)
         g = h + e
@@ -139,92 +170,114 @@ class MD5Ex:
             char_pos += 1
             i: int = self.char_code_at(n, char_pos)
 
-            if char_pos < str_len and 55296 <= h <= 56319 and 56320 <= i <= 57343:
-                h = 65536 + self.bit_shift((1023 & h), 10, 'l') + (1023 & i)
+            if (
+                char_pos < str_len
+                and 55296 <= h <= 56319
+                and 56320 <= i <= 57343
+            ):
+                h = 65536 + self.bit_shift((1023 & h), 10, "l") + (1023 & i)
                 char_pos += 1
 
             if h <= 127:
                 r_list.append(h)
             elif h <= 2047:
-                r_list.extend([
-                    192 | self.bit_shift(h, 6, 'r', True) & 31,
-                    128 | 63 & h
-                ])
+                r_list.extend(
+                    [192 | self.bit_shift(h, 6, "r", True) & 31, 128 | 63 & h]
+                )
             elif h <= 65535:
-                r_list.extend([
-                    224 | self.bit_shift(h, 12, 'r', True) & 15,
-                    128 | self.bit_shift(h, 6, 'r', True) & 63,
-                    128 | 63 & h
-                ])
+                r_list.extend(
+                    [
+                        224 | self.bit_shift(h, 12, "r", True) & 15,
+                        128 | self.bit_shift(h, 6, "r", True) & 63,
+                        128 | 63 & h,
+                    ]
+                )
             elif h <= 2097151:
-                r_list.extend([
-                    240 | self.bit_shift(h, 18, 'r', True) & 7,
-                    128 | self.bit_shift(h, 12, 'r', True) & 63,
-                    128 | self.bit_shift(h, 6, 'r', True) & 63,
-                    128 | 63 & h
-                ])
+                r_list.extend(
+                    [
+                        240 | self.bit_shift(h, 18, "r", True) & 7,
+                        128 | self.bit_shift(h, 12, "r", True) & 63,
+                        128 | self.bit_shift(h, 6, "r", True) & 63,
+                        128 | 63 & h,
+                    ]
+                )
 
-        return ''.join(chr(byte) for byte in r_list)
+        return "".join(chr(byte) for byte in r_list)
 
-    def strBin( self, n ):
+    def strBin(self, n):
+        """String to Binary"""
 
-        """ String to Binary """
-
-        i = self.bit_shift( len(n), 3, 'l' )
+        i = self.bit_shift(len(n), 3, "l")
         r = {}
         h = 0
 
         while h < i:
-            tmp = self.bit_shift( h, 5 )
-            r[tmp] = r.get(tmp, 0) | self.bit_shift( (255 & self.char_code_at( n, self.bit_shift( h, 3 ))), (31 & h), 'l' )
+            tmp = self.bit_shift(h, 5)
+            r[tmp] = r.get(tmp, 0) | self.bit_shift(
+                (255 & self.char_code_at(n, self.bit_shift(h, 3))),
+                (31 & h),
+                "l",
+            )
             h += 8
 
         return r
 
-    def binHex( self, n ):
+    def binHex(self, n):
+        """Binary to Hex"""
 
-        """ Binary to Hex """
-
-        t = ''
-        f = self.bit_shift( len(n), 5, 'l' )
+        t = ""
+        f = self.bit_shift(len(n), 5, "l")
         r = 0
 
         while r < f:
-            h = self.bit_shift( n.get( self.bit_shift( r, 5 ), 0 ), (31 & r), 'r', True ) & 255
-            i = self.bit_shift( h, 4, 'r', True ) & 15
+            h = (
+                self.bit_shift(
+                    n.get(self.bit_shift(r, 5), 0), (31 & r), "r", True
+                )
+                & 255
+            )
+            i = self.bit_shift(h, 4, "r", True) & 15
             h &= 15
             t += self.hex[i] + self.hex[h]
             r += 8
 
         return t
 
-    def binStr( self, n ):
+    def binStr(self, n):
+        """Binary to String"""
 
-        """ Binary to String """
-
-        r = ''
-        t = self.bit_shift( len(n), 5, 'l' )
+        r = ""
+        t = self.bit_shift(len(n), 5, "l")
         i = 0
 
         while i < t:
-            h = self.bit_shift( n.get( self.bit_shift( i, 5 ), 0 ), (31 & i), 'r', True ) & 255
+            h = (
+                self.bit_shift(
+                    n.get(self.bit_shift(i, 5), 0), (31 & i), "r", True
+                )
+                & 255
+            )
             r += chr(h)
             i += 8
 
         return r
 
-    def binHexBin( self, n ):
+    def binHexBin(self, n):
+        """binHexBin method"""
 
-        """ binHexBin method """
-
-        t = self.bit_shift( len(n), 5, 'l' )
+        t = self.bit_shift(len(n), 5, "l")
         f = {}
         r = 0
 
         while r < t:
 
-            h = self.bit_shift( n.get( self.bit_shift( r, 5 ), 0 ), (31 & r), 'r', True ) & 255
-            i = self.bit_shift( h, 4, 'r', True ) & 15
+            h = (
+                self.bit_shift(
+                    n.get(self.bit_shift(r, 5), 0), (31 & r), "r", True
+                )
+                & 255
+            )
+            i = self.bit_shift(h, 4, "r", True) & 15
             h &= 15
 
             tmp2 = 48
@@ -235,14 +288,17 @@ class MD5Ex:
             if 9 < h:
                 tmp3 = 87
 
-            tmp = self.bit_shift( r, 4 )
-            f[tmp] = f.get(tmp, 0) | self.bit_shift( tmp2 + i + self.bit_shift( (tmp3 + h), 8, 'l'), self.bit_shift((15 & r), 1, 'l'), 'l' )
+            tmp = self.bit_shift(r, 4)
+            f[tmp] = f.get(tmp, 0) | self.bit_shift(
+                tmp2 + i + self.bit_shift((tmp3 + h), 8, "l"),
+                self.bit_shift((15 & r), 1, "l"),
+                "l",
+            )
             r += 8
 
         return f
 
-    def fghi( self, n, h, i, r, t, f, e, g ):
-
+    def fghi(self, n, h, i, r, t, f, e, g):
         """
         method that is used by ff,gg,hh,ii
         This was originally duplicated code in each method
@@ -250,55 +306,66 @@ class MD5Ex:
         """
 
         o = (65535 & n) + (65535 & g) + (65535 & t) + (65535 & e)
-        g = self.bit_shift( self.bit_shift( n, 16 ) + self.bit_shift( g, 16, 'r') + self.bit_shift( t, 16 ) + self.bit_shift( e, 16 ) + self.bit_shift( o, 16 ), 16, 'l' )
+        g = self.bit_shift(
+            self.bit_shift(n, 16)
+            + self.bit_shift(g, 16, "r")
+            + self.bit_shift(t, 16)
+            + self.bit_shift(e, 16)
+            + self.bit_shift(o, 16),
+            16,
+            "l",
+        )
         g = g | 65535 & o
-        g = self.bit_shift( g, f, 'l' ) | self.bit_shift( g, ( 32 - f ), 'r', True )
+        g = self.bit_shift(g, f, "l") | self.bit_shift(g, (32 - f), "r", True)
         o = (65535 & g) + (65535 & h)
-        g = self.bit_shift( self.bit_shift( g, 16 ) + self.bit_shift( h, 16 ) + self.bit_shift( o, 16 ), 16, 'l' )
+        g = self.bit_shift(
+            self.bit_shift(g, 16)
+            + self.bit_shift(h, 16)
+            + self.bit_shift(o, 16),
+            16,
+            "l",
+        )
 
         return g | 65535 & o
 
-    def ff( self, n, h, i, r, t, f, e ):
-
-        """ ff method used in binHash """
+    def ff(self, n, h, i, r, t, f, e):
+        """ff method used in binHash"""
 
         g = h & i | ~h & r
         return self.fghi(n, h, i, r, t, f, e, g)
 
-    def gg( self, n, h, i, r, t, f, e ):
-
-        """ gg method used in binHash """
+    def gg(self, n, h, i, r, t, f, e):
+        """gg method used in binHash"""
 
         g = h & r | i & ~r
         return self.fghi(n, h, i, r, t, f, e, g)
 
-    def hh( self, n, h, i, r, t, f, e ):
-
-        """ hh method used in binHash """
+    def hh(self, n, h, i, r, t, f, e):
+        """hh method used in binHash"""
 
         g = h ^ i ^ r
         return self.fghi(n, h, i, r, t, f, e, g)
 
-    def ii( self, n, h, i, r, t, f, e ):
-
-        """ ii method used in binHash """
+    def ii(self, n, h, i, r, t, f, e):
+        """ii method used in binHash"""
 
         g = i ^ (h | ~r)
         return self.fghi(n, h, i, r, t, f, e, g)
 
-    def binHash( self, n, h ):
-
-        """ Binary to Hash """
+    def binHash(self, n, h):
+        """Binary to Hash"""
 
         a = 1732584193
         u = -271733879
         s = -1732584194
         c = 271733878
 
-        tmp = self.bit_shift( h, 5 )
-        n[ tmp ] = n.get( tmp, 0 ) | self.bit_shift( 128, (31 & h), 'l' )
-        tmp = 14 + self.bit_shift( self.bit_shift( ( h + 64 ), 9, 'r', True ), 4, 'l' )
-        n[ tmp ] = h
+        tmp = self.bit_shift(h, 5)
+        n[tmp] = n.get(tmp, 0) | self.bit_shift(128, (31 & h), "l")
+        tmp = 14 + self.bit_shift(
+            self.bit_shift((h + 64), 9, "r", True), 4, "l"
+        )
+        n[tmp] = h
         i = len(n)
         r = 0
 
@@ -375,14 +442,58 @@ class MD5Ex:
             u = self.ii(u, s, c, a, n.get((r + 9), 0), 21, -343485551)
 
             o = (65535 & a) + (65535 & t)
-            a = self.bit_shift( ( self.bit_shift( a, 16 ) + self.bit_shift( t, 16 ) + self.bit_shift( o, 16 ) ), 16, 'l' ) | 65535 & o
+            a = (
+                self.bit_shift(
+                    (
+                        self.bit_shift(a, 16)
+                        + self.bit_shift(t, 16)
+                        + self.bit_shift(o, 16)
+                    ),
+                    16,
+                    "l",
+                )
+                | 65535 & o
+            )
             o = (65535 & u) + (65535 & f)
-            u = self.bit_shift( ( self.bit_shift( u, 16 ) + self.bit_shift( f, 16 ) + self.bit_shift( o, 16 ) ), 16, 'l' ) | 65535 & o
+            u = (
+                self.bit_shift(
+                    (
+                        self.bit_shift(u, 16)
+                        + self.bit_shift(f, 16)
+                        + self.bit_shift(o, 16)
+                    ),
+                    16,
+                    "l",
+                )
+                | 65535 & o
+            )
             o = (65535 & s) + (65535 & e)
-            s = self.bit_shift( ( self.bit_shift( s, 16 ) + self.bit_shift( e, 16 ) + self.bit_shift( o, 16 ) ), 16, 'l' ) | 65535 & o
+            s = (
+                self.bit_shift(
+                    (
+                        self.bit_shift(s, 16)
+                        + self.bit_shift(e, 16)
+                        + self.bit_shift(o, 16)
+                    ),
+                    16,
+                    "l",
+                )
+                | 65535 & o
+            )
             o = (65535 & c) + (65535 & g)
-            c = self.bit_shift( ( self.bit_shift( c, 16 ) + self.bit_shift( g, 16 ) + self.bit_shift( o, 16 ) ), 16, 'l' ) | 65535 & o
+            c = (
+                self.bit_shift(
+                    (
+                        self.bit_shift(c, 16)
+                        + self.bit_shift(g, 16)
+                        + self.bit_shift(o, 16)
+                    ),
+                    16,
+                    "l",
+                )
+                | 65535 & o
+            )
 
             r += 16
 
-        return {0:a, 1:u, 2:s, 3:c}
+        return {0: a, 1: u, 2: s, 3: c}
