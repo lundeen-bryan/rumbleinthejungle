@@ -1,7 +1,7 @@
 # Auto updated?
 #   Yes
 # Modified:
-#   Sunday, March 2, 2025 7:45:20 PM PST
+#   Wednesday, March 5, 2025 6:20:31 AM PST
 #
 """
 The snippet above is from an Ext from TheRepoClub called File Header Generator
@@ -57,6 +57,16 @@ from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 reqs = requests.session()
+
+def to_unicode( text, encoding='utf-8', errors='strict' ):
+
+    """ Forces text to unicode """
+
+    if isinstance(text, bytes):
+        return text.decode(encoding, errors=errors)
+
+    return text
+
 
 def request_get(url, data=None, extra_headers=None):
     """

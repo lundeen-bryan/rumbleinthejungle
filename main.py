@@ -1,7 +1,7 @@
 # Auto updated?
 #   Yes
 # Modified:
-#   Tuesday, March 4, 2025 8:52:59 PM PST
+#   Wednesday, March 5, 2025 6:20:35 AM PST
 #
 """
 The snippet above is from an Ext from TheRepoClub called File Header Generator
@@ -97,16 +97,6 @@ def favorites_create():
         os.mkdir(addon_data_path)
 
     xbmc.sleep(1)
-
-def to_unicode( text, encoding='utf-8', errors='strict' ):
-
-    """ Forces text to unicode """
-
-    if isinstance(text, bytes):
-        return text.decode(encoding, errors=errors)
-
-    return text
-
 
 
 def favorites_load(return_string: bool = False):
