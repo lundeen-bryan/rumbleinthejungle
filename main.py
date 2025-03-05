@@ -1,7 +1,7 @@
 # Auto updated?
 #   Yes
 # Modified:
-#   Tuesday, March 4, 2025 6:52:42 PM PST
+#   Tuesday, March 4, 2025 7:58:01 PM PST
 #
 """
 The snippet above is from an Ext from TheRepoClub called File Header Generator
@@ -892,40 +892,37 @@ def favorites_show():
         xbmcplugin.endOfDirectory(PLUGIN_ID)
 
 
-def favorite_add(name, url, fav_mode, thumb, fanart, plot, cat, folder, play):
+def add_favorite_video(video_title: str, video_url: str, favorite_mode: int,
+                       thumbnail: str, fanart_image: str, plot_summary: str,
+                       category: str, is_folder: bool, playback_mode: int) -> None:
     """
-    Add a new favorite item to the favorites list.
+    Add a video to the favorites list.
 
-    This function adds a new favorite item with the provided details to the favorites list.
-    It loads the existing favorites, appends the new item, and saves the updated list.
-    Finally, it notifies the user that the item has been added to favorites.
+    This function appends a new favorite video entry—containing metadata such as
+    title, URL, mode, thumbnail, fanart, plot summary, category, folder flag, and playback mode—
+    to the favorites file. After updating the file, it displays a notification to inform the user
+    that the video has been added.
 
-    Parameters:
-    name (str): The name or title of the favorite item.
-    url (str): The URL associated with the favorite item.
-    fav_mode (int): The mode number for the favorite item.
-    thumb (str): The URL or path to the thumbnail image for the favorite.
-    fanart (str): The URL or path to the fanart image for the favorite.
-    plot (str): A brief description or plot summary of the favorite item.
-    cat (str): The category of the favorite item.
-    folder (str): A string indicating whether the item is a folder ('True' or 'False').
-    play (str): A string representing the play mode for the favorite item.
+    Args:
+        video_title (str): The title of the video.
+        video_url (str): The URL of the video.
+        favorite_mode (int): The mode number associated with this favorite.
+        thumbnail (str): The URL or path to the video's thumbnail image.
+        fanart_image (str): The URL or path to the video's fanart image.
+        plot_summary (str): A brief description or summary of the video.
+        category (str): The category to which the video belongs.
+        is_folder (bool): Whether the item should be treated as a folder.
+        playback_mode (int): The playback mode for the video (e.g., 0 for non-playable, 2 for playable).
 
     Returns:
-    None
-
-    Side effects:
-    - Updates the favorites file with the new item.
-    - Displays a notification to the user.
+        None
     """
-    data = favorites_load()
-    data.append((name, url, fav_mode, thumb, fanart, plot, cat, folder, play))
-    fav_file = open( favorites, 'w' )
-    fav_file.write(json.dumps(data))
-    fav_file.close()
-
-    notify( get_string(30152), name, thumb )
-
+    favorites_data = favorites_load()
+    favorites_data.append((video_title, video_url, favorite_mode, thumbnail,
+                           fanart_image, plot_summary, category, is_folder, playback_mode))
+    with open(favorites, 'w', encoding='utf-8') as fav_file:
+        fav_file.write(json.dumps(favorites_data))
+    notify(get_string(30152), video_title, thumbnail)
 
 
 def favorite_remove(name):
@@ -1506,7 +1503,7 @@ def main():
         if '  - ' in name:
             name = name.split('  - ')[0]
         if mode == 5:
-            favorite_add(name, url, fav_mode, thumb, fanart, plot, cat, str(folder), str(play))
+            add_favorite_video(name, url, fav_mode, thumb, fanart, plot, cat, str(folder), str(play))
         else:
             favorite_remove(name)
     elif mode == 7:
