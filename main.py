@@ -1,7 +1,7 @@
 # Auto updated?
 #   Yes
 # Modified:
-#   Tuesday, March 4, 2025 8:16:17 PM PST
+#   Tuesday, March 4, 2025 8:52:59 PM PST
 #
 """
 The snippet above is from an Ext from TheRepoClub called File Header Generator
@@ -31,15 +31,14 @@ import re
 import os
 
 
-from typing import Optional
+from urllib.parse import urlparse, parse_qs, urlencode, urlunparse
+from typing import Optional, Union
 
 import xbmc
 import xbmcplugin
 import xbmcgui
 import xbmcaddon
 import xbmcvfs
-
-import urllib.parse
 
 from lib.general import *
 from lib.rumble_user import RumbleUser
@@ -66,6 +65,17 @@ RUMBLE_USER = RumbleUser()
 
 favorites = xbmcvfs.translatePath(os.path.join(ADDON.getAddonInfo('profile'), 'favorites.dat'))
 
+def build_page_url(base_url: str, page: int) -> str:
+    """
+    Given a base URL, update its query parameters to include the page number.
+    """
+    parsed = urlparse(base_url)
+    # parse_qs returns values as lists, so convert them into single values
+    query_params = {k: v[0] for k, v in parse_qs(parsed.query).items()}
+    query_params['page'] = str(page)
+    new_query = urlencode(query_params)
+    return urlunparse((parsed.scheme, parsed.netloc, parsed.path,
+                       parsed.params, new_query, parsed.fragment))
 
 def favorites_create():
     """
@@ -224,65 +234,66 @@ def search_menu():
 
     xbmcplugin.endOfDirectory(PLUGIN_ID)
 
-
-
-def pagination(url, page, cat, search=False):
+def pagination(url: str, page: int, category: str, search: Optional[str] = None) -> None:
     """
     List directory items and show pagination.
 
-    Parameters:
-    url (str): The base URL for the directory.
-    page (int): The current page number.
-    cat (str): The category of the directory.
-    search (str, optional): The search string. Defaults to False.
+    If no results are loaded, this function prompts the user to either refresh
+    the container or go back.
+
+    Args:
+        url (str): The base URL for the directory.
+        page (int): The current page number.
+        category (str): The category of the directory.
+        search (Optional[str]): A search query string, if applicable.
 
     Returns:
-    None. This function does not return any value.
+        None
     """
-    if url > '':
+    if url:
+        # Combine search query if provided
+        if search:
+            combined_url = f"{url}{search}"
+        else:
+            combined_url = url
 
-        page = int(page)
-        page_url = url
-        paginated = True
+        # Update the query parameters to include the current page number
+        page_url = build_page_url(combined_url, page)
 
-        if page == 1:
-            if search:
-                page_url = url + search
-        elif search and cat == 'video':
-            page_url = url + search + "&page=" + str( page )
-        elif cat in {'channel', 'cat_video', 'user', 'other', 'subscriptions', 'live_stream' }:
-            page_url = url + "?page=" + str( page )
+        # For certain categories, we might not paginate.
+        paginated = category not in {'following', 'top', 'cat_list'}
 
-        if cat in { 'following', 'top', 'cat_list' }:
-            paginated = False
+        # Retrieve results
+        amount = list_rumble(page_url, category)
 
-        amount = list_rumble( page_url, cat )
+        # Handle empty results
+        if amount == 0:
+            dialog = xbmcgui.Dialog()
+            if dialog.yesno("No results loaded", "Would you like to try again?"):
+                xbmc.executebuiltin('Container.Refresh')
+            else:
+                xbmc.executebuiltin('Container.GoBack')
+            return
 
+        # If pagination is enabled and there are enough items, add a link for the next page.
         if paginated and amount > 15 and page < 10:
-
-            # for next page
-            page = page + 1
-
-            name = get_string(30150) + " " + str( page )
+            next_page = page + 1
+            name = f"{get_string(30150)} {next_page}"
             list_item = xbmcgui.ListItem(name)
 
             link_params = {
                 'url': url,
                 'mode': '3',
                 'name': name,
-                'page': str( page ),
-                'cat': cat,
+                'page': str(next_page),
+                'cat': category,
             }
-
-            link = build_url( link_params )
-
-            if search and cat == 'video':
-                link = link + "&search=" + urllib.parse.quote_plus(search)
+            link = build_url(link_params)
+            if search and category == 'video':
+                link = f"{link}&search={urllib.parse.quote_plus(search)}"
 
             xbmcplugin.addDirectoryItem(PLUGIN_ID, link, list_item, True)
-
     xbmcplugin.endOfDirectory(PLUGIN_ID)
-
 
 
 def get_image(data, image_id):
