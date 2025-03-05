@@ -1,7 +1,7 @@
 # Auto updated?
 #   Yes
 # Modified:
-#   Tuesday, March 4, 2025 7:58:01 PM PST
+#   Tuesday, March 4, 2025 8:16:17 PM PST
 #
 """
 The snippet above is from an Ext from TheRepoClub called File Header Generator
@@ -924,42 +924,30 @@ def add_favorite_video(video_title: str, video_url: str, favorite_mode: int,
         fav_file.write(json.dumps(favorites_data))
     notify(get_string(30152), video_title, thumbnail)
 
-
-def favorite_remove(name):
+def remove_favorite_video(video_title: str) -> None:
     """
-    Remove a favorite item from the favorites list based on its name.
+    Remove a favorite video from the favorites list by title.
 
-    This function searches for a favorite item with the given name in the favorites list,
-    removes it if found, and updates the favorites file. It then notifies the user about
-    the removal.
+    This function searches for a favorite video matching the provided title,
+    removes it from the favorites data, updates the favorites file, and notifies
+    the user of the removal.
 
-    Parameters:
-    name (str): The name of the favorite item to be removed.
+    Args:
+        video_title (str): The title of the video to remove from favorites.
 
     Returns:
-    None
-
-    Note:
-    - This function currently loops through all favorites to find a match.
-    - Future improvements may include using a more unique identifier and a more
-      efficient removal method.
+        None
     """
-    # TODO: remove via something more unique instead
-    # TODO: remove via a method that doesn't require to loop through all favorites
+    favorites_data = favorites_load()
+    for index, favorite in enumerate(favorites_data):
+        if favorite[0] == video_title:
+            del favorites_data[index]
+            with open(favorites, 'w', encoding='utf-8') as fav_file:
+                fav_file.write(json.dumps(favorites_data))
+            break
 
-    data = favorites_load()
-
-    if data:
-        for index in range(len(data)):
-            if data[index][0] == name:
-                del data[index]
-                fav_file = open(favorites, 'w')
-                fav_file.write(json.dumps(data))
-                fav_file.close()
-                break
-
-    notify(get_string(30154), name)
-
+    notify(get_string(30154), video_title)
+    xbmc.executebuiltin('Container.Refresh')
 
 
 def favorites_import():
@@ -1505,7 +1493,7 @@ def main():
         if mode == 5:
             add_favorite_video(name, url, fav_mode, thumb, fanart, plot, cat, str(folder), str(play))
         else:
-            favorite_remove(name)
+            remove_favorite_video(name)
     elif mode == 7:
         favorites_show()
     elif mode == 8:
