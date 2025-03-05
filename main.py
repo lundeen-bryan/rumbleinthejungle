@@ -1,7 +1,7 @@
 # Auto updated?
 #   Yes
 # Modified:
-#   Tuesday, March 4, 2025 6:45:31 PM PST
+#   Tuesday, March 4, 2025 6:52:42 PM PST
 #
 """
 The snippet above is from an Ext from TheRepoClub called File Header Generator
@@ -99,7 +99,7 @@ def to_unicode( text, encoding='utf-8', errors='strict' ):
 
 
 
-def favorites_load(return_string=False):
+def favorites_load(return_string: bool = False):
     """
     Load favorites from file into a variable.
 
@@ -111,9 +111,9 @@ def favorites_load(return_string=False):
     str or list: The favorites as a string or list, depending on the return_string parameter.
                   If the favorites file does not exist, an empty string or list is returned.
     """
-
     if os.path.exists(favorites):
-        fav_str = open(favorites).read()
+        with open(favorites, 'r', encoding='utf-8') as fav_file:
+            fav_str = fav_file.read()
         if return_string:
             return fav_str
         if fav_str:
@@ -121,11 +121,8 @@ def favorites_load(return_string=False):
     else:
         favorites_create()
 
-    # nothing to load, return type necessary
-    if return_string:
-        return ''
+    return '' if return_string else []
 
-    return []
 
 def prompt_user_for_search(heading: str = '', message: str = '') -> Optional[str]:
     """
