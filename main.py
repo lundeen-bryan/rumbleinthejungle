@@ -1,7 +1,7 @@
 # Auto updated?
 #   Yes
 # Modified:
-#   Wednesday, March 5, 2025 6:25:07 AM PST
+#   Wednesday, March 5, 2025 6:29:47 AM PST
 #
 """
 The snippet above is from an Ext from TheRepoClub called File Header Generator
@@ -598,7 +598,7 @@ def dir_list_create( data, cat, video_type='video', search = False, play=0 ):
                 img_id = img_id[0] if img_id else ""
 
                 if img_id:
-                    img = str( get_image( data, img_id ) )
+                    img = str( extract_image_url( data, img_id ) )
                 else:
                     img = MEDIA_DIR + 'letters/' + channel_name[0] + '.png'
 
