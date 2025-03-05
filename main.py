@@ -1,7 +1,7 @@
 # Auto updated?
 #   Yes
 # Modified:
-#   Wednesday, March 5, 2025 6:20:35 AM PST
+#   Wednesday, March 5, 2025 6:25:07 AM PST
 #
 """
 The snippet above is from an Ext from TheRepoClub called File Header Generator
@@ -286,31 +286,25 @@ def pagination(url: str, page: int, category: str, search: Optional[str] = None)
     xbmcplugin.endOfDirectory(PLUGIN_ID)
 
 
-def get_image(data, image_id):
+def extract_image_url(html_content: str, image_id: int) -> str:
     """
-    Method to get an image from scraped page's CSS from the image ID.
+    Extract the URL of an image from a CSS background-image rule based on its image ID.
 
-    Parameters:
-    data (str): The scraped HTML page content.
-    image_id (int): The ID of the image to find.
+    This function searches the provided HTML content for a CSS rule corresponding to the
+    given image ID and extracts the URL specified in the 'background-image' property.
+
+    Args:
+        html_content (str): The HTML content to search.
+        image_id (int): The image identifier used in the CSS class (e.g., in 'user-image--img--id-{image_id}').
 
     Returns:
-    str: The URL of the image if found, otherwise an empty string.
-
-    The function uses a regular expression to search for the CSS rule for the given image ID
-    and extracts the URL from the 'background-image' property.
+        str: The extracted image URL if found; otherwise, an empty string.
     """
-    image_re = re.compile(
-        "i.user-image--img--id-" + str(image_id) + ".+?{\s*background-image: url(.+?);",
-        re.MULTILINE|re.DOTALL|re.IGNORECASE
-    ).findall(data)
+    pattern = rf"i\.user-image--img--id-{image_id}.*?\{{\s*background-image:\s*url\((.*?)\);"
+    matches = re.findall(pattern, html_content, flags=re.MULTILINE | re.DOTALL | re.IGNORECASE)
+    return matches[0] if matches else ""
 
-    if image_re != []:
-        image = str(image_re[0]).replace('(', '').replace(')', '')
-    else:
-        image = ''
 
-    return image
 def get_video_id(url):
     """
     Extracts the video ID from a Rumble video URL.
