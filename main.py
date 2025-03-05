@@ -1,7 +1,7 @@
 # Auto updated?
 #   Yes
 # Modified:
-#   Sunday, March 2, 2025 8:31:11 PM PST
+#   Tuesday, March 4, 2025 6:45:31 PM PST
 #
 """
 The snippet above is from an Ext from TheRepoClub called File Header Generator
@@ -30,13 +30,16 @@ import sys
 import re
 import os
 
+
+from typing import Optional
+
 import xbmc
 import xbmcplugin
 import xbmcgui
 import xbmcaddon
 import xbmcvfs
 
-import urllib
+import urllib.parse
 
 from lib.general import *
 from lib.rumble_user import RumbleUser
@@ -124,28 +127,39 @@ def favorites_load(return_string=False):
 
     return []
 
-
-def get_search_string(heading='', message=''):
+def prompt_user_for_search(heading: str = '', message: str = '') -> Optional[str]:
     """
-    Ask the user for a search string.
+    Prompt the user for a search string using a Kodi keyboard dialog.
 
-    Parameters:
-    heading (str): The heading for the keyboard input dialog. Default is an empty string.
-    message (str): The message for the keyboard input dialog. Default is an empty string.
+    This function displays a keyboard input dialog to the user, allowing them
+    to enter a search string. The dialog can be customized with a heading and
+    a message.
+
+    Args:
+        heading (str): The heading text for the keyboard input dialog.
+                       Defaults to an empty string.
+        message (str): The message text for the keyboard input dialog.
+                       Defaults to an empty string.
 
     Returns:
-    str: The search string entered by the user. If the user cancels the input, the function returns None.
-    """
-    search_string = None
+        Optional[str]: The search string entered by the user if confirmed,
+                       or None if the user cancels the input.
 
+    Example:
+        search_query = prompt_user_for_search("Search", "Enter your search term:")
+        if search_query:
+            perform_search(search_query)
+        else:
+            print("Search was cancelled.")
+    """
+    user_input = None
     keyboard = xbmc.Keyboard(message, heading)
     keyboard.doModal()
 
     if keyboard.isConfirmed():
-        search_string = to_unicode(keyboard.getText())
+        user_input = keyboard.getText()
 
-    return search_string
-
+    return user_input
 
 
 def home_menu():
@@ -792,34 +806,32 @@ def play_video(name, url, thumb, play=2):
         xbmcgui.Dialog().ok( 'Error', 'Video not found' )
 
 
-def search_items(url, cat):
+def search_items(base_url: str, category: str) -> None:
     """
-    Performs a search on Rumble based on user input.
+    Perform a search on Rumble based on user input and display results.
 
     This function prompts the user for a search string, encodes it,
     and then calls the pagination function to display search results.
 
-    Parameters:
-    url (str): The base URL for the search operation.
-    cat (str): The category of the search (e.g., 'video', 'channel').
+    Args:
+        base_url (str): The base URL for the search operation.
+        category (str): The category of the search (e.g., 'video', 'channel').
 
     Returns:
-    None: This function doesn't return a value, but it triggers
-          the display of search results through the pagination function.
+        None: This function doesn't return a value, but it triggers
+              the display of search results through the pagination function.
 
     Note:
-    If the user cancels the search input, the function returns early
-    without performing a search.
+        If the user cancels the search input, the function returns early
+        without performing a search.
     """
-    search_str = get_search_string(heading="Search")
+    search_query = prompt_user_for_search(heading="Search")
 
-    if not search_str:
+    if not search_query:
         return
 
-    title = urllib.parse.quote_plus(search_str)
-
-    pagination(url, 1, cat, title)
-
+    encoded_query = urllib.parse.quote_plus(search_query)
+    pagination(base_url, 1, category, encoded_query)
 
 def favorites_show():
     """
