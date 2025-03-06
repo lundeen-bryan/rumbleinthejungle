@@ -1,7 +1,7 @@
 # Auto updated?
 #   Yes
 # Modified:
-#   Wednesday, March 5, 2025 9:02:59 PM PST
+#   Wednesday, March 5, 2025 9:49:22 PM PST
 #
 """
 The snippet above is from an Ext from TheRepoClub called File Header Generator
@@ -32,7 +32,7 @@ import os
 
 
 from urllib.parse import urlparse, parse_qs, urlencode, urlunparse
-from typing import Optional, Union
+from typing import Optional, Union, List, Tuple
 
 import xbmc
 import xbmcplugin
@@ -442,7 +442,7 @@ def create_directory_listing(html_data: str, category: str, listing_type: str = 
                 video_title = ''
                 images = {}
                 info_labels = {}
-                subscribe_context = False
+                subscribe_context = {}
 
                 title_match = re.compile(r'<h3(?:[^\>]+)?>(.*)</h3>', re.DOTALL | re.IGNORECASE).findall(video)
                 link_match = re.compile(r'<a\sclass="videostream__link link"\sdraggable="false"\shref="([^\"]+)">', re.DOTALL | re.IGNORECASE).findall(video)
@@ -551,9 +551,13 @@ def create_directory_listing(html_data: str, category: str, listing_type: str = 
                 followers_match = re.compile(r'<span\sclass=\"(?:[^\"]+)\">\s+([^&]+)&nbsp;Follower(?:s)?\s+</span>', re.DOTALL | re.IGNORECASE).findall(channel)
                 followers = followers_match[0] if followers_match else "0"
                 img_id_match = re.compile(r'user-image--img--id-([^\s]+)\s', re.DOTALL | re.IGNORECASE).findall(channel)
-                img_id = img_id_match[0] if img_id_match else ""
-                if img_id:
-                    img_url = str(extract_image_url(html_data, img_id))
+                img_id_str = img_id_match[0] if img_id_match else ""
+                if img_id_str:
+                    try:
+                        img_id = int(img_id_str)
+                        img_url = str(extract_image_url(html_data, img_id))
+                    except ValueError:
+                        img_url = MEDIA_DIR + 'letters/' + channel_name[0] + '.png'
                 else:
                     img_url = MEDIA_DIR + 'letters/' + channel_name[0] + '.png'
                 images = {'thumb': str(img_url), 'fanart': str(img_url)}
@@ -588,9 +592,9 @@ def resolve_video_url(video_url: str) -> Optional[str]:
     """
     Resolves a Rumble video URL to a direct media link based on the user's playback settings.
 
-    This function extracts the video ID from the given Rumble URL, retrieves available
-    quality options via the Rumble API, and selects the appropriate media URL based on
-    the user's playback method:
+    This function extracts the video ID from the provided Rumble URL, retrieves available quality
+    options via the Rumble API, and selects the appropriate media URL according to the user's
+    playback method preference:
       - Playback method 0 (high auto): Automatically selects the highest quality.
       - Playback method 1 (low auto): Automatically selects the lowest quality.
       - Playback method 2 (quality select): Prompts the user to choose the desired quality.
@@ -599,26 +603,21 @@ def resolve_video_url(video_url: str) -> Optional[str]:
         video_url (str): The Rumble video URL to resolve.
 
     Returns:
-        Optional[str]: The direct media URL if resolved successfully; otherwise, None.
+        Optional[str]: The resolved direct media URL if successful; otherwise, None.
     """
-    # Determine the user's playback preference (0: high auto, 1: low auto, 2: quality select)
-    playback_method = int(ADDON.getSetting('playbackMethod'))
+    playback_method: int = int(ADDON.getSetting('playbackMethod'))  # 0, 1, or 2
     resolved_url: Optional[str] = None
-
-    # For playback methods that require selection, collect available quality URLs.
-    quality_urls = [] if playback_method > 0 else None
+    quality_urls: List[Tuple[str, str]] = []  # List of tuples (quality, url)
 
     video_id = get_video_id(video_url)
     if not video_id:
         return None
 
-    # Build API URL to fetch video details
     api_url = f"{BASE_URL}/embedJS/u3/?request=video&ver=2&v={video_id}"
     api_response = request_get(api_url)
     qualities = ['1080', '720', '480', '360', 'hls']
 
     for quality in qualities:
-        # Build a regex pattern to extract the URL for the given quality
         pattern = rf'"{quality}".+?url.+?:"(.*?)"'
         matches = re.findall(pattern, api_response, flags=re.MULTILINE | re.DOTALL | re.IGNORECASE)
         if matches:
@@ -629,10 +628,11 @@ def resolve_video_url(video_url: str) -> Optional[str]:
                 quality_urls.append((quality, matches[0]))
 
     if playback_method > 0 and quality_urls:
-        # If only one URL is available and it's an HLS stream, process it.
+        # If only one URL is available and it's an HLS stream, process it using M3U8Processor.
         if len(quality_urls) == 1 and '.m3u8' in quality_urls[0][1]:
-            from lib.m3u8 import m3u8  # Assumes m3u8 processing is available.
+            from lib.m3u8 import M3U8Processor  # Updated import based on available attribute
             m3u8_handler = M3U8Processor()
+            # Assuming m3u8_handler.process returns a list of (quality, url) tuples.
             quality_urls = m3u8_handler.process(request_get(quality_urls[0][1]))
         if playback_method == 1:
             # For low auto, reverse the list to select the lowest quality.
@@ -640,16 +640,19 @@ def resolve_video_url(video_url: str) -> Optional[str]:
             resolved_url = quality_urls[0][1]
         elif playback_method == 2:
             # For quality select, prompt the user.
-            selected_index = 0 if len(quality_urls) == 1 else xbmcgui.Dialog().select(
-                'Select Quality', [quality or '?' for quality, _ in quality_urls]
-            )
+            selected_index: int
+            if len(quality_urls) == 1:
+                selected_index = 0
+            else:
+                quality_labels = [quality for quality, _ in quality_urls]
+                selected_index = xbmcgui.Dialog().select('Select Quality', quality_labels)
             if selected_index != -1:
                 resolved_url = quality_urls[selected_index][1]
 
     if resolved_url:
         resolved_url = resolved_url.replace(r'\/', '/')
-
     return resolved_url
+
 '''
  *
  * Stop Here
