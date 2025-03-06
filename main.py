@@ -1,7 +1,7 @@
 # Auto updated?
 #   Yes
 # Modified:
-#   Thursday, March 6, 2025 6:49:52 AM PST
+#   Thursday, March 6, 2025 7:12:35 AM PST
 #
 """
 The snippet above is from an Ext from TheRepoClub called File Header Generator
@@ -693,6 +693,34 @@ def play_kodi_video(video_title: str, video_url: str, thumbnail_url: str, play_m
     else:
         xbmcgui.Dialog().ok('Error', 'Video not found')
 
+def perform_search_and_display_results(rumble_base_url: str, search_category: str) -> None:
+    """
+    Execute a Rumble search based on user input and display the paginated results.
+
+    This function:
+    1. Prompts the user for a search query.
+    2. Encodes the query for URL usage.
+    3. Calls the pagination function to display the resulting pages.
+
+    Args:
+        rumble_base_url (str): The base URL for performing the Rumble search.
+        search_category (str): The category of the search (e.g., 'video', 'channel').
+
+    Returns:
+        None: The function does not explicitly return a value. It initiates
+        the display of search results through the pagination function.
+
+    Note:
+        If the user cancels the search input (i.e., provides no query),
+        the function returns without performing the search.
+    """
+    user_search_input = prompt_user_for_search(heading="Search")
+
+    if not user_search_input:
+        return
+
+    encoded_search_query: str = urllib.parse.quote_plus(user_search_input)
+    pagination(rumble_base_url, 1, search_category, encoded_search_query)
 
 '''
  *
@@ -700,32 +728,6 @@ def play_kodi_video(video_title: str, video_url: str, thumbnail_url: str, play_m
  *
 '''
 
-def search_items(base_url: str, category: str) -> None:
-    """
-    Perform a search on Rumble based on user input and display results.
-
-    This function prompts the user for a search string, encodes it,
-    and then calls the pagination function to display search results.
-
-    Args:
-        base_url (str): The base URL for the search operation.
-        category (str): The category of the search (e.g., 'video', 'channel').
-
-    Returns:
-        None: This function doesn't return a value, but it triggers
-              the display of search results through the pagination function.
-
-    Note:
-        If the user cancels the search input, the function returns early
-        without performing a search.
-    """
-    search_query = prompt_user_for_search(heading="Search")
-
-    if not search_query:
-        return
-
-    encoded_query = urllib.parse.quote_plus(search_query)
-    pagination(base_url, 1, category, encoded_query)
 
 def favorites_show():
     """
@@ -1374,7 +1376,7 @@ def main():
     elif mode == 1:
         search_menu()
     elif mode == 2:
-        search_items(url, cat)
+        perform_search_and_display_results(url, cat)
     elif mode == 3:
         if search and search is not None:
             pagination(url, page, cat, search)
