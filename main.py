@@ -1,7 +1,7 @@
 # Auto updated?
 #   Yes
 # Modified:
-#   Wednesday, March 5, 2025 9:49:22 PM PST
+#   Thursday, March 6, 2025 6:49:52 AM PST
 #
 """
 The snippet above is from an Ext from TheRepoClub called File Header Generator
@@ -653,65 +653,52 @@ def resolve_video_url(video_url: str) -> Optional[str]:
         resolved_url = resolved_url.replace(r'\/', '/')
     return resolved_url
 
+def play_kodi_video(video_title: str, video_url: str, thumbnail_url: str, play_method: int = 2) -> None:
+    """
+    Resolves and plays a video in Kodi.
+
+    This function takes an original video URL, resolves it to a playable stream, and initiates
+    playback in Kodi. It checks the add-on settings to determine whether to switch from HTTPS to HTTP,
+    creates a Kodi ListItem with the video metadata and thumbnail, and then starts playback based on
+    the specified playback method.
+
+    Args:
+        video_title (str): The title of the video.
+        video_url (str): The original URL of the video to resolve.
+        thumbnail_url (str): The URL or local path to the video's thumbnail image.
+        play_method (int, optional): Playback method indicator. Defaults to 2.
+            - 1: Immediate playback using xbmc.Player().
+            - 2: Deferred playback using xbmcplugin.setResolvedUrl().
+
+    Returns:
+        None
+    """
+    resolved_url = resolve_video_url(video_url)
+
+    if resolved_url:
+        # Apply HTTP if the user set HTTP as the default protocol.
+        if ADDON.getSetting('useHTTP') == 'true':
+            resolved_url = resolved_url.replace('https://', 'http://', 1)
+
+        video_list_item = xbmcgui.ListItem(video_title, path=resolved_url)
+        video_list_item.setArt({'icon': thumbnail_url, 'thumb': thumbnail_url})
+
+        info_labels = {'Title': video_title, 'plot': ''}
+        item_set_info(video_list_item, info_labels)
+
+        if play_method == 1:
+            xbmc.Player().play(item=resolved_url, listitem=video_list_item)
+        elif play_method == 2:
+            xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, video_list_item)
+    else:
+        xbmcgui.Dialog().ok('Error', 'Video not found')
+
+
 '''
  *
  * Stop Here
  *
 '''
-
-
-
-def play_video(name, url, thumb, play=2):
-    """
-    Resolves and plays a video in Kodi.
-
-    This function takes a video URL, resolves it to a playable stream, and initiates
-    playback in Kodi. It handles different playback methods and applies user settings.
-
-    Args:
-        name (str): The title of the video to be played.
-        url (str): The initial URL of the video, which will be resolved.
-        thumb (str): The URL or path of the video's thumbnail image.
-        play (int, optional): The playback method to use. Defaults to 2.
-                              1: Immediate playback using xbmc.Player().
-                              2: Deferred playback using xbmcplugin.setResolvedUrl().
-
-    Behavior:
-        - Resolves the video URL using the resolve_video_url() function.
-        - Applies HTTP protocol if specified in addon settings.
-        - Creates a ListItem with video metadata and artwork.
-        - Initiates playback based on the 'play' parameter.
-        - Displays an error dialog if the video URL cannot be resolved.
-
-    Note:
-        This function relies on Kodi's xbmc and xbmcplugin modules for playback,
-        as well as addon-specific settings and helper functions.
-    """
-
-    # get video link
-    url = resolve_video_url(url)
-
-    if url:
-
-        # Use HTTP
-        if ADDON.getSetting('useHTTP') == 'true':
-            url = url.replace('https://', 'http://', 1)
-
-        list_item = xbmcgui.ListItem(name, path=url)
-        list_item.setArt({'icon': thumb, 'thumb': thumb})
-
-        info_labels={ 'Title': name, 'plot': '' }
-
-        item_set_info( list_item, info_labels )
-
-        if play == 1:
-            xbmc.Player().play(item=url, listitem=list_item)
-        elif play == 2:
-            xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, list_item)
-
-    else:
-        xbmcgui.Dialog().ok( 'Error', 'Video not found' )
-
 
 def search_items(base_url: str, category: str) -> None:
     """
@@ -1394,7 +1381,7 @@ def main():
         else:
             pagination(url, page, cat)
     elif mode == 4:
-        play_video(name, url, thumb, play)
+        play_kodi_video(name, url, thumb, play)
     elif mode in [5, 6]:
         if '\\ ' in name:
             name = name.split('\\ ')[1]
