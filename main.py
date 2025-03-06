@@ -1,7 +1,7 @@
 # Auto updated?
 #   Yes
 # Modified:
-#   Wednesday, March 5, 2025 6:29:47 AM PST
+#   Wednesday, March 5, 2025 9:02:59 PM PST
 #
 """
 The snippet above is from an Ext from TheRepoClub called File Header Generator
@@ -367,383 +367,295 @@ def list_rumble(url, cat):
 
     if 'search' in url:
         if cat == 'video':
-            amount = dir_list_create( data, cat, 'video', True, 1 )
+            amount = create_directory_listing( data, cat, 'video', True, 1 )
         else:
-            amount = dir_list_create( data, cat, 'channel', True )
+            amount = create_directory_listing( data, cat, 'channel', True )
     elif cat in { 'subscriptions', 'cat_video', 'live_stream', 'playlist' }:
-        amount = dir_list_create( data, cat, cat, False, 2 )
+        amount = create_directory_listing( data, cat, cat, False, 2 )
     elif cat in { 'channel', 'top', 'other' }:
-        amount = dir_list_create( data, cat, 'video', False, 2 )
+        amount = create_directory_listing( data, cat, 'video', False, 2 )
     elif cat in { 'channel_video', 'user' }:
-        amount = dir_list_create( data, cat, 'channel_video', False, 2 )
+        amount = create_directory_listing( data, cat, 'channel_video', False, 2 )
     elif cat == 'following':
-        amount = dir_list_create( data, cat, 'following', False, 2 )
+        amount = create_directory_listing( data, cat, 'following', False, 2 )
     elif cat == 'cat_list':
-        amount = dir_list_create( data, cat, cat, False )
+        amount = create_directory_listing( data, cat, cat, False )
 
     return amount
 
 
 
-def dir_list_create( data, cat, video_type='video', search = False, play=0 ):
-
+def create_directory_listing(html_data: str, category: str, listing_type: str = 'video', is_search: bool = False, play_mode: int = 0) -> int:
     """
-    Create and display directory list based on the given type.
+    Creates and displays a directory listing based on the provided HTML content and listing type.
 
     Parameters:
-    data (str): The HTML data containing the directory list items.
-    cat (str): The category of the directory list items.
-    video_type (str, optional): The type of the directory list items. Defaults to 'video'.
-    search (bool, optional): Whether the function is being used for searching. Defaults to False.
-    play (int, optional): The play mode for the directory list items. Defaults to 0.
+        html_data (str): The HTML content containing the directory listing items.
+        category (str): The category for the directory listing items.
+        listing_type (str, optional): The type of listing to create. Supported types include:
+            'video', 'cat_video', 'subscriptions', 'live_stream', 'channel_video', 'playlist',
+            'cat_list', 'following', etc. Defaults to 'video'.
+        is_search (bool, optional): Indicates whether the listing is generated as a result of a search.
+            Defaults to False.
+        play_mode (int, optional): The play mode for the directory items. Defaults to 0.
 
     Returns:
-    int: The number of directory list items created.
+        int: The number of directory listing items created.
     """
-
-    amount = 0
-
+    item_count = 0
     one_line_titles = ADDON.getSetting('one_line_titles') == 'true'
 
-    if video_type == 'video':
-        videos = re.compile(r'href=\"([^\"]+)\"><div class=\"(?:[^\"]+)\"><img\s*class=\"video-item--img\"\s*src=\"([^\"]+)\"\s*alt=\"(?:[^\"]+)\"\s*>(?:<span class=\"video-item--watching\">[^\<]+</span>)?(?:<div class=video-item--overlay-rank>(?:[0-9]+)</div>)?</div><(?:[^\>]+)></span></a><div class=\"video-item--info\"><time class=\"video-item--meta video-item--time\" datetime=(.+?)-(.+?)-(.+?)T(?:.+?) title\=\"(?:[^\"]+)\">(?:[^\<]+)</time><h3 class=video-item--title>(.+?)</h3><address(?:[^\>]+)><a rel=author class=\"(?:[^\=]+)=(.+?)><div class=ellipsis-1>(.+?)</div>', re.MULTILINE|re.DOTALL|re.IGNORECASE).findall(data)
+    if listing_type == 'video':
+        video_pattern = re.compile(
+            r'href=\"([^\"]+)\"><div class=\"(?:[^\"]+)\"><img\s*class=\"video-item--img\"\s*src=\"([^\"]+)\"\s*alt=\"(?:[^\"]+)\"\s*>(?:<span class=\"video-item--watching\">[^\<]+</span>)?(?:<div class=video-item--overlay-rank>(?:[0-9]+)</div>)?</div><(?:[^\>]+)></span></a><div class=\"video-item--info\"><time class=\"video-item--meta video-item--time\" datetime=(.+?)-(.+?)-(.+?)T(?:.+?) title\=\"(?:[^\"]+)\">(?:[^\<]+)</time><h3 class=video-item--title>(.+?)</h3><address(?:[^\>]+)><a rel=author class=\"(?:[^\=]+)=(.+?)><div class=ellipsis-1>(.+?)</div>',
+            re.MULTILINE | re.DOTALL | re.IGNORECASE
+        )
+        videos = video_pattern.findall(html_data)
         if videos:
-            amount = len(videos)
+            item_count = len(videos)
             for link, img, year, month, day, title, channel_link, channel_name in videos:
-
                 info_labels = {}
-
                 if '<svg' in channel_name:
                     channel_name = channel_name.split('<svg')[0] + " (Verified)"
-
-                info_labels[ 'year' ] = year
-
-                video_title = '[B]' + clean_text( title ) + '[/B]'
+                info_labels['year'] = year
+                video_title = '[B]' + clean_text(title) + '[/B]'
                 video_title += ' - ' if one_line_titles else '\n'
-                video_title += '[COLOR gold]' + channel_name + '[/COLOR] - [COLOR lime]' + get_date_formatted( DATE_FORMAT, year, month, day ) + '[/COLOR]'
-
-                images = { 'thumb': str(img), 'fanart': str(img) }
-
-                #open get url and open player
-                add_dir( video_title, BASE_URL + link, 4, images, info_labels, cat, False, True, play, { 'name' : channel_link, 'subscribe': True }  )
-
-    elif video_type in { 'cat_video', 'subscriptions', 'live_stream', 'channel_video', 'playlist' }:
-
-        if video_type == 'live_stream':
+                video_title += '[COLOR gold]' + channel_name + '[/COLOR] - [COLOR lime]' + get_date_formatted(DATE_FORMAT, year, month, day) + '[/COLOR]'
+                images = {'thumb': str(img), 'fanart': str(img)}
+                add_dir(video_title, BASE_URL + link, 4, images, info_labels, category, False, True, play_mode, {'name': channel_link, 'subscribe': True})
+    elif listing_type in {'cat_video', 'subscriptions', 'live_stream', 'channel_video', 'playlist'}:
+        if listing_type == 'live_stream':
             videos_regex = r'<div class=\"thumbnail__grid\"\s*role=\"list\">(.*)<nav class=\"paginator\">'
-        elif video_type == 'playlist':
+        elif listing_type == 'playlist':
             videos_regex = r'<ol\s*class=\"videostream__list\"(?:[^>]+)>(.*)</ol>'
         else:
             videos_regex = r'<ol\s*class=\"thumbnail__grid\">(.*)</ol>'
-        videos = re.compile(videos_regex, re.DOTALL|re.IGNORECASE).findall(data)
-
-        if videos:
-            if video_type == 'playlist':
-                videos = videos[0].split('"videostream videostream__list-item')
+        videos_section = re.compile(videos_regex, re.DOTALL | re.IGNORECASE).findall(html_data)
+        if videos_section:
+            if listing_type == 'playlist':
+                video_items = videos_section[0].split('"videostream videostream__list-item')
             else:
-                videos = videos[0].split('"videostream thumbnail__grid-')
-
-            videos.pop(0)
-            amount = len(videos)
-            for video in videos:
-
+                video_items = videos_section[0].split('"videostream thumbnail__grid-')
+            video_items.pop(0)
+            item_count = len(video_items)
+            for video in video_items:
                 video_title = ''
                 images = {}
                 info_labels = {}
                 subscribe_context = False
 
-                title = re.compile(r'<h3(?:[^\>]+)?>(.*)</h3>', re.DOTALL|re.IGNORECASE).findall(video)
-                link = re.compile(r'<a\sclass="videostream__link link"\sdraggable="false"\shref="([^\"]+)">', re.DOTALL|re.IGNORECASE).findall(video)
-                img = re.compile(r'<img\s*class=\"thumbnail__image\"\s*draggable=\"false\"\s*src=\"([^\"]+)\"', re.DOTALL|re.IGNORECASE).findall(video)
+                title_match = re.compile(r'<h3(?:[^\>]+)?>(.*)</h3>', re.DOTALL | re.IGNORECASE).findall(video)
+                link_match = re.compile(r'<a\sclass="videostream__link link"\sdraggable="false"\shref="([^\"]+)">', re.DOTALL | re.IGNORECASE).findall(video)
+                img_match = re.compile(r'<img\s*class=\"thumbnail__image\"\s*draggable=\"false\"\s*src=\"([^\"]+)\"', re.DOTALL | re.IGNORECASE).findall(video)
 
-                if title:
-                    video_title = '[B]' + clean_text( title[0] ) + '[/B]'
+                if title_match:
+                    video_title = '[B]' + clean_text(title_match[0]) + '[/B]'
                 if 'videostream__status--live' in video:
                     video_title += ' [COLOR red](Live)[/COLOR]'
                 if 'videostream__status--upcoming' in video:
                     video_title += ' [COLOR yellow](Upcoming)[/COLOR]'
 
-                channel_name = re.compile(r'<span\sclass="channel__name(?:[^\"]+)" title="(?:[^\"]+)">([^\<]+)</span>(\s*<svg class=channel__verified)?', re.DOTALL|re.IGNORECASE).findall(video)
-                channel_link = re.compile(r'<a\s*rel=\"author\"\s*class=\"channel__link\slink\s(?:[^\"]+)\"\s*href=\"([^\"]+)\"\s*>', re.DOTALL|re.IGNORECASE).findall(video)
-
-                if channel_name:
-
+                channel_name_match = re.compile(
+                    r'<span\sclass="channel__name(?:[^\"]+)" title="(?:[^\"]+)">([^\<]+)</span>(\s*<svg class=channel__verified)?',
+                    re.DOTALL | re.IGNORECASE
+                ).findall(video)
+                channel_link_match = re.compile(
+                    r'<a\s*rel=\"author\"\s*class=\"channel__link\slink\s(?:[^\"]+)\"\s*href=\"([^\"]+)\"\s*>',
+                    re.DOTALL | re.IGNORECASE
+                ).findall(video)
+                if channel_name_match:
                     video_title += ' - ' if one_line_titles else '\n'
-                    video_title += '[COLOR gold]' + clean_text( channel_name[0][0] )
-                    if channel_name[0][1]:
+                    video_title += '[COLOR gold]' + clean_text(channel_name_match[0][0])
+                    if channel_name_match[0][1]:
                         video_title += " (Verified)"
                     video_title += '[/COLOR]'
-
-                    if channel_link:
-                        subscribe_context = { 'name' : channel_link[0], 'subscribe': True }
-
-                date_time = re.compile(r'<time\s*class=\"(?:[^\"]+)\"\s*datetime=\"(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})-(\d{2}):(\d{2})\"', re.DOTALL|re.IGNORECASE).findall(video)
-
-                if date_time:
-                    info_labels[ 'year' ] = date_time[0][0]
-                    video_title += ' - [COLOR lime]' + get_date_formatted( DATE_FORMAT, date_time[0][0], date_time[0][1], date_time[0][2] ) + '[/COLOR]'
-
-                if img:
-                    images = { 'thumb': str(img[0]), 'fanart': str(img[0]) }
-
-                duration = re.compile(r'videostream__status--duration\"\s*>([^<]+)</div>', re.DOTALL|re.IGNORECASE).findall(video)
-
-                if duration:
-                    info_labels[ 'duration' ] = duration_to_secs( duration[0].strip() )
-
-                #open get url and open player
-                add_dir( video_title, BASE_URL + link[0], 4, images, info_labels, cat, False, True, play, subscribe_context  )
-
-        return amount
-
-    elif video_type == 'cat_list':
-        cat_list = re.compile(r'<a\s*class=\"category__link link\"\s*href=\"([^\"]+)\"\s*>\s*<img\s*class=\"category__image\"\s*src=\"([^\"]+)\"\s*alt=(?:[^\>]+)>\s*<strong class=\"category__title\">([^\<]+)</strong>', re.DOTALL|re.IGNORECASE).findall(data)
-        if cat_list:
-            amount = len(cat_list)
-            for link, img, title in cat_list:
-
-                cat = 'channel_video'
-                images = { 'thumb': str(img), 'fanart': str(img) }
-
-                #open get url and open player
-                add_dir( clean_text( title ), BASE_URL + link.strip() + '/videos', 3, images, {}, cat )
-
-    elif video_type == 'following':
-
-        videos_regex = r'<ol\s*class=\"followed-channels__list\">(.*)</ol>'
-        videos = re.compile(videos_regex, re.DOTALL|re.IGNORECASE).findall(data)
-        if videos:
-            videos = videos[0].split('"followed-channel flex items-')
-
-            videos.pop(0)
-            amount = len(videos)
-            for video in videos:
-
+                    if channel_link_match:
+                        subscribe_context = {'name': channel_link_match[0], 'subscribe': True}
+                date_time_match = re.compile(
+                    r'<time\s*class=\"(?:[^\"]+)\"\s*datetime=\"(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})-(\d{2}):(\d{2})\"',
+                    re.DOTALL | re.IGNORECASE
+                ).findall(video)
+                if date_time_match:
+                    info_labels['year'] = date_time_match[0][0]
+                    video_title += ' - [COLOR lime]' + get_date_formatted(DATE_FORMAT, date_time_match[0][0], date_time_match[0][1], date_time_match[0][2]) + '[/COLOR]'
+                if img_match:
+                    images = {'thumb': str(img_match[0]), 'fanart': str(img_match[0])}
+                duration_match = re.compile(r'videostream__status--duration\"\s*>([^<]+)</div>', re.DOTALL | re.IGNORECASE).findall(video)
+                if duration_match:
+                    info_labels['duration'] = duration_to_secs(duration_match[0].strip())
+                add_dir(video_title, BASE_URL + link_match[0], 4, images, info_labels, category, False, True, play_mode, subscribe_context)
+    elif listing_type == 'cat_list':
+        category_list = re.compile(
+            r'<a\s*class=\"category__link link\"\s*href=\"([^\"]+)\"\s*>\s*<img\s*class=\"category__image\"\s*src=\"([^\"]+)\"\s*alt=(?:[^\>]+)>\s*<strong class=\"category__title\">([^\<]+)</strong>',
+            re.DOTALL | re.IGNORECASE
+        ).findall(html_data)
+        if category_list:
+            item_count = len(category_list)
+            for link, img, title in category_list:
+                new_category = 'channel_video'
+                images = {'thumb': str(img), 'fanart': str(img)}
+                add_dir(clean_text(title), BASE_URL + link.strip() + '/videos', 3, images, {}, new_category)
+    elif listing_type == 'following':
+        followed_regex = r'<ol\s*class=\"followed-channels__list\">(.*)</ol>'
+        followed_section = re.compile(followed_regex, re.DOTALL | re.IGNORECASE).findall(html_data)
+        if followed_section:
+            video_items = followed_section[0].split('"followed-channel flex items-')
+            video_items.pop(0)
+            item_count = len(video_items)
+            for video in video_items:
                 video_title = ''
                 images = {}
-
-                title = re.compile(r'<span\s*class=\"line-clamp-2\">([^<]+)<\/span>', re.DOTALL|re.IGNORECASE).findall(video)
-                followers = re.compile(r'<div\s*class=\"followed-channel__followers(?:[^\"]+)\">([^<]+)</div>', re.DOTALL|re.IGNORECASE).findall(video)
-                link = re.compile(r'<a\s*class=\"(?:[^\"]+)\"\s*href=\"(\/(?:c|user)\/[^\"]+)\"\s*>', re.DOTALL|re.IGNORECASE).findall(video)
-                img = re.compile(r'<(?:img|span)\s*class=\"channel__avatar([^\"]+)\"\s*(?:src=\"([^\"]+)\")?', re.DOTALL|re.IGNORECASE).findall(video)
-
-                if title:
-                    video_title = '[B]' + clean_text( title[0] ) + '[/B]'
-
+                title_match = re.compile(r'<span\s*class=\"line-clamp-2\">([^<]+)<\/span>', re.DOTALL | re.IGNORECASE).findall(video)
+                followers_match = re.compile(r'<div\s*class=\"followed-channel__followers(?:[^\"]+)\">([^<]+)</div>', re.DOTALL | re.IGNORECASE).findall(video)
+                link_match = re.compile(r'<a\s*class=\"(?:[^\"]+)\"\s*href=\"(\/(?:c|user)\/[^\"]+)\"\s*>', re.DOTALL | re.IGNORECASE).findall(video)
+                img_match = re.compile(r'<(?:img|span)\s*class=\"channel__avatar([^\"]+)\"\s*(?:src=\"([^\"]+)\")?', re.DOTALL | re.IGNORECASE).findall(video)
+                if title_match:
+                    video_title = '[B]' + clean_text(title_match[0]) + '[/B]'
                 if '<use href="#channel_verified" />' in video:
                     video_title += ' [COLOR gold](Verified)[/COLOR]'
-
-                link = link[0] if link else ""
-
-                if img:
-                    if 'channel__letter' in img[0][0]:
-                        if title:
-                            image_url = MEDIA_DIR + 'letters/' + title[0][0].lower() + '.png'
-                        else:
-                            image_url = ''
+                channel_link = link_match[0] if link_match else ""
+                if img_match:
+                    if 'channel__letter' in img_match[0][0]:
+                        image_url = MEDIA_DIR + 'letters/' + title_match[0][0].lower() if title_match else ''
                     else:
-                        image_url = img[0][1]
-
-                    images = { 'thumb': str(image_url), 'fanart': str(image_url) }
-
-                    if 'channel__live' in img[0][0]:
+                        image_url = img_match[0][1]
+                    images = {'thumb': str(image_url), 'fanart': str(image_url)}
+                    if 'channel__live' in img_match[0][0]:
                         video_title += ' [COLOR red](Live)[/COLOR]'
-
-                if followers:
+                if followers_match:
                     video_title += ' - ' if one_line_titles else '\n'
-                    video_title += '[COLOR green]' + followers[0].strip() + '[/COLOR]'
-
-                cat = 'user'
-                if '/user/' not in link:
-                    cat = 'channel_video'
-
-                #open get url and open player
-                add_dir( video_title, BASE_URL + link, 3, images, {}, cat, True, True, play, { 'name' : link, 'subscribe': False } )
-
+                    video_title += '[COLOR green]' + followers_match[0].strip() + '[/COLOR]'
+                new_category = 'user' if '/user/' in channel_link else 'channel_video'
+                add_dir(video_title, BASE_URL + channel_link, 3, images, {}, new_category, True, True, play_mode, {'name': channel_link, 'subscribe': False})
     else:
-
         channels_regex = r'<div class="main-and-sidebar">(.*)<nav class="paginator">'
-        channels = re.compile(channels_regex, re.DOTALL|re.IGNORECASE).findall(data)
-        if channels:
-            channels = channels[0].split('<article')
-
+        channels_section = re.compile(channels_regex, re.DOTALL | re.IGNORECASE).findall(html_data)
+        if channels_section:
+            channels = channels_section[0].split('<article')
             channels.pop(0)
-            amount = len(channels)
+            item_count = len(channels)
             for channel in channels:
-
-                link = re.compile(r'<a\shref=([^\s]+)\sclass=\"(?:[^\"]+)\">', re.DOTALL|re.IGNORECASE).findall(channel)
-                link = link[0] if link else ""
-                xbmc.log( json.dumps(link), xbmc.LOGWARNING )
-                # split channel and user
-                if search:
-                    if cat == 'channel':
-                        if '/c/' not in link:
-                            continue
-                    else:
-                        if '/user/' not in link:
-                            continue
-
+                link_match = re.compile(r'<a\shref=([^\s]+)\sclass=\"(?:[^\"]+)\">', re.DOTALL | re.IGNORECASE).findall(channel)
+                channel_link = link_match[0] if link_match else ""
+                xbmc.log(json.dumps(channel_link), xbmc.LOGWARNING)
+                # Filter based on search context and category type
+                if is_search:
+                    if category == 'channel' and '/c/' not in channel_link:
+                        continue
+                    elif category != 'channel' and '/user/' not in channel_link:
+                        continue
                 images = {}
-
-                channel_name = re.compile(r'<span\sclass=\"block\struncate\">([^<]+)<\/span>', re.DOTALL|re.IGNORECASE).findall(channel)
-                channel_name = channel_name[0] if channel_name else ""
-
-                is_verified = re.compile(r'<title>Verified</title>', re.DOTALL|re.IGNORECASE).findall(channel)
-                is_verified = True if is_verified else False
-
-                followers = re.compile(r'<span\sclass=\"(?:[^\"]+)\">\s+([^&]+)&nbsp;Follower(?:s)?\s+</span>', re.DOTALL|re.IGNORECASE).findall(channel)
-                followers = followers[0] if followers else "0"
-
-                img_id = re.compile(r'user-image--img--id-([^\s]+)\s', re.DOTALL|re.IGNORECASE).findall(channel)
-                img_id = img_id[0] if img_id else ""
-
+                channel_name_match = re.compile(r'<span\sclass=\"block\struncate\">([^<]+)<\/span>', re.DOTALL | re.IGNORECASE).findall(channel)
+                channel_name = channel_name_match[0] if channel_name_match else ""
+                verified = bool(re.compile(r'<title>Verified</title>', re.DOTALL | re.IGNORECASE).findall(channel))
+                followers_match = re.compile(r'<span\sclass=\"(?:[^\"]+)\">\s+([^&]+)&nbsp;Follower(?:s)?\s+</span>', re.DOTALL | re.IGNORECASE).findall(channel)
+                followers = followers_match[0] if followers_match else "0"
+                img_id_match = re.compile(r'user-image--img--id-([^\s]+)\s', re.DOTALL | re.IGNORECASE).findall(channel)
+                img_id = img_id_match[0] if img_id_match else ""
                 if img_id:
-                    img = str( extract_image_url( data, img_id ) )
+                    img_url = str(extract_image_url(html_data, img_id))
                 else:
-                    img = MEDIA_DIR + 'letters/' + channel_name[0] + '.png'
-
-                images = { 'thumb': str(img), 'fanart': str(img) }
-
+                    img_url = MEDIA_DIR + 'letters/' + channel_name[0] + '.png'
+                images = {'thumb': str(img_url), 'fanart': str(img_url)}
                 video_title = '[B]' + channel_name + '[/B]'
-                if is_verified:
+                if verified:
                     video_title += ' [COLOR gold](Verified)[/COLOR]'
                 video_title += ' - ' if one_line_titles else '\n'
                 video_title += '[COLOR palegreen]' + followers + '[/COLOR] [COLOR yellow]' + get_string(30156) + '[/COLOR]'
+                add_dir(video_title, BASE_URL + channel_link, 3, images, {}, category, True, True, play_mode, {'name': channel_link, 'subscribe': True})
+    return item_count
 
-                #open get url and open player
-                add_dir( video_title, BASE_URL + link, 3, images, {}, cat, True, True, play, { 'name' : link, 'subscribe': True } )
 
-    return amount
-
-def get_playlist_video_id(url):
+def extract_playlist_video_id(url: str) -> Optional[str]:
     """
-    Extracts the playlist video ID from a given URL.
+    Retrieve and extract the playlist video ID from a given URL.
 
-    This function retrieves the HTML content of the provided URL and uses a regular
-    expression to find the 'data-id' attribute, which represents the playlist video ID.
+    This function fetches the HTML content from the specified URL using `request_get`,
+    then uses a regular expression to locate the 'data-id' attribute. This ID is essential
+    for operations like adding videos to playlists.
 
     Args:
         url (str): The URL of the playlist video page.
 
     Returns:
-        str or False: The extracted playlist video ID if found, or False if not found.
-
-    Note:
-        This function is useful for adding videos to playlists, as it provides the
-        necessary ID for such operations.
+        Optional[str]: The extracted playlist video ID if found; otherwise, None.
     """
+    html_content = request_get(url)
+    match = re.search(r'data-id="([0-9]+)"', html_content, re.MULTILINE | re.DOTALL | re.IGNORECASE)
+    return match.group(1) if match else None
 
-    data = request_get(url)
-
-    # gets embed id from embed url
-    video_id = re.compile(
-        'data-id=\"([0-9]+)\"',
-        re.MULTILINE|re.DOTALL|re.IGNORECASE
-    ).findall(data)
-
-    if video_id:
-        return video_id[0]
-    return False
-
-
-def resolver(url):
+def resolve_video_url(video_url: str) -> Optional[str]:
     """
-    Resolves a Rumble video URL and returns the direct media link.
+    Resolves a Rumble video URL to a direct media link based on the user's playback settings.
 
-    This function takes a Rumble video URL, extracts the video ID, and then fetches
-    available quality options from Rumble's API. It selects the appropriate media URL
-    based on the user's playback method preference.
+    This function extracts the video ID from the given Rumble URL, retrieves available
+    quality options via the Rumble API, and selects the appropriate media URL based on
+    the user's playback method:
+      - Playback method 0 (high auto): Automatically selects the highest quality.
+      - Playback method 1 (low auto): Automatically selects the lowest quality.
+      - Playback method 2 (quality select): Prompts the user to choose the desired quality.
 
     Args:
-        url (str): The Rumble video URL to resolve.
+        video_url (str): The Rumble video URL to resolve.
 
     Returns:
-        str or False: The resolved direct media URL if successful, False otherwise.
-
-    Behavior:
-        - Playback method 0 (high auto): Selects the highest quality automatically.
-        - Playback method 1 (low auto): Selects the lowest quality automatically.
-        - Playback method 2 (quality select): Prompts the user to choose the quality.
-
-    Notes:
-        - Supports various video qualities: 1080p, 720p, 480p, 360p, and HLS.
-        - Handles m3u8 (HLS) streams separately.
-        - Uses regex to parse the API response for video URLs.
-        - Replaces escaped forward slashes in the final URL.
-
-    Dependencies:
-        - Requires the ADDON settings for 'playbackMethod'.
-        - Uses external functions: get_video_id, request_get.
-        - May import lib.m3u8 for HLS stream processing.
+        Optional[str]: The direct media URL if resolved successfully; otherwise, None.
     """
+    # Determine the user's playback preference (0: high auto, 1: low auto, 2: quality select)
+    playback_method = int(ADDON.getSetting('playbackMethod'))
+    resolved_url: Optional[str] = None
 
-    # playback options - 0: high auto, 1: low auto, 2: quality select
-    playback_method = int( ADDON.getSetting('playbackMethod') )
+    # For playback methods that require selection, collect available quality URLs.
+    quality_urls = [] if playback_method > 0 else None
 
-    media_url = False
+    video_id = get_video_id(video_url)
+    if not video_id:
+        return None
 
-    if playback_method > 0:
-        urls = []
+    # Build API URL to fetch video details
+    api_url = f"{BASE_URL}/embedJS/u3/?request=video&ver=2&v={video_id}"
+    api_response = request_get(api_url)
+    qualities = ['1080', '720', '480', '360', 'hls']
 
-    video_id = get_video_id( url )
+    for quality in qualities:
+        # Build a regex pattern to extract the URL for the given quality
+        pattern = rf'"{quality}".+?url.+?:"(.*?)"'
+        matches = re.findall(pattern, api_response, flags=re.MULTILINE | re.DOTALL | re.IGNORECASE)
+        if matches:
+            if playback_method == 0:
+                resolved_url = matches[0]
+                break
+            else:
+                quality_urls.append((quality, matches[0]))
 
-    if video_id:
+    if playback_method > 0 and quality_urls:
+        # If only one URL is available and it's an HLS stream, process it.
+        if len(quality_urls) == 1 and '.m3u8' in quality_urls[0][1]:
+            from lib.m3u8 import m3u8  # Assumes m3u8 processing is available.
+            m3u8_handler = M3U8Processor()
+            quality_urls = m3u8_handler.process(request_get(quality_urls[0][1]))
+        if playback_method == 1:
+            # For low auto, reverse the list to select the lowest quality.
+            quality_urls.reverse()
+            resolved_url = quality_urls[0][1]
+        elif playback_method == 2:
+            # For quality select, prompt the user.
+            selected_index = 0 if len(quality_urls) == 1 else xbmcgui.Dialog().select(
+                'Select Quality', [quality or '?' for quality, _ in quality_urls]
+            )
+            if selected_index != -1:
+                resolved_url = quality_urls[selected_index][1]
 
-        # use site api to get video urls
-        # TODO: use as dict / array instead of using regex to get URLs
-        data = request_get(BASE_URL + '/embedJS/u3/?request=video&ver=2&v=' + video_id)
-        sizes = [ '1080', '720', '480', '360', 'hls' ]
+    if resolved_url:
+        resolved_url = resolved_url.replace(r'\/', '/')
 
-        for quality in sizes:
+    return resolved_url
+'''
+ *
+ * Stop Here
+ *
+'''
 
-            # get urls for quality
-            matches = re.compile(
-                '"' + quality + '".+?url.+?:"(.*?)"',
-                re.MULTILINE|re.DOTALL|re.IGNORECASE
-            ).findall(data)
-
-            if matches:
-                if playback_method > 0:
-                    urls.append(( quality, matches[0] ))
-                else:
-                    media_url = matches[0]
-                    break
-
-        # if not automatically selecting highest quality
-        if int( playback_method ) > 0:
-
-            # m3u8 check
-            if len( urls ) == 1 and '.m3u8' in urls[0][1]:
-                from lib.m3u8 import m3u8
-                m3u8_handler = M3U8Processor()
-                urls = m3u8_handler.process( request_get( urls[0][1] ) )
-
-            # reverses array - small to large
-            if playback_method == 1:
-                urls = urls[::-1]
-                media_url = urls[0][1]
-
-
-            # quality select
-            elif playback_method == 2:
-
-                if len(urls) > 0:
-
-                    if len(urls) == 1:
-                        # if only one available, no point asking
-                        selected_index = 0
-                    else:
-                        selected_index = xbmcgui.Dialog().select(
-                            'Select Quality', [(sourceItem[0] or '?') for sourceItem in urls]
-                        )
-
-                    if selected_index != -1:
-                        media_url = urls[selected_index][1]
-
-    if media_url:
-        media_url = media_url.replace('\/', '/')
-
-    return media_url
 
 
 def play_video(name, url, thumb, play=2):
@@ -762,7 +674,7 @@ def play_video(name, url, thumb, play=2):
                               2: Deferred playback using xbmcplugin.setResolvedUrl().
 
     Behavior:
-        - Resolves the video URL using the resolver() function.
+        - Resolves the video URL using the resolve_video_url() function.
         - Applies HTTP protocol if specified in addon settings.
         - Creates a ListItem with video metadata and artwork.
         - Initiates playback based on the 'play' parameter.
@@ -774,7 +686,7 @@ def play_video(name, url, thumb, play=2):
     """
 
     # get video link
-    url = resolver(url)
+    url = resolve_video_url(url)
 
     if url:
 
