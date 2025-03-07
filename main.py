@@ -1,7 +1,7 @@
 # Auto updated?
 #   Yes
 # Modified:
-#   Thursday, March 6, 2025 7:12:35 AM PST
+#   Thursday, March 6, 2025 10:38:09 PM PST
 #
 """
 The snippet above is from an Ext from TheRepoClub called File Header Generator
@@ -339,7 +339,6 @@ def get_video_id(url):
     return False
 
 
-
 def list_rumble(url, cat):
     """
     Method to get and display items from Rumble.
@@ -382,7 +381,6 @@ def list_rumble(url, cat):
         amount = create_directory_listing( data, cat, cat, False )
 
     return amount
-
 
 
 def create_directory_listing(html_data: str, category: str, listing_type: str = 'video', is_search: bool = False, play_mode: int = 0) -> int:
@@ -722,13 +720,6 @@ def perform_search_and_display_results(rumble_base_url: str, search_category: st
     encoded_search_query: str = urllib.parse.quote_plus(user_search_input)
     pagination(rumble_base_url, 1, search_category, encoded_search_query)
 
-'''
- *
- * Stop Here
- *
-'''
-
-
 def favorites_show():
     """
     Displays the user's favorite items in the Kodi interface.
@@ -767,29 +758,24 @@ def favorites_show():
     data = favorites_load()
 
     try:
-
-        amount = len(data)
-        if amount > 0:
-            for i in data:
-                name = i[0]
-                url = i[1]
-                mode = i[2]
-                images = { 'thumb': str(i[3]), 'fanart': str(i[4]) }
-                info_labels = { 'plot': str(i[5]) }
-                cat = i[6]
-                folder = ( i[7] == 'True' )
-                play = i[8]
-
-                add_dir( name, url, mode, images, info_labels, cat, folder, True, int(play) )
+        if data:  # Check if the list is non-empty
+            for (name, url, mode, thumb, fanart, plot, cat, folder_str, play_str) in data:
+                images = {
+                    'thumb': str(thumb),
+                    'fanart': str(fanart)
+                }
+                info_labels = {'plot': str(plot)}
+                folder = (folder_str == 'True')
+                add_dir(name, url, mode, images, info_labels, cat, folder, True, int(play_str))
 
             xbmcplugin.endOfDirectory(PLUGIN_ID)
         else:
-            xbmcgui.Dialog().ok( get_string(14117), get_string(30155) )
+            xbmcgui.Dialog().ok(get_string(14117), get_string(30155))
 
-    except Exception:
-
+    except Exception as e:
+        # Log the error for debugging
+        xbmc.log(f"[Favorites Error] {e}", level=xbmc.LOGERROR)
         xbmcplugin.endOfDirectory(PLUGIN_ID)
-
 
 def add_favorite_video(video_title: str, video_url: str, favorite_mode: int,
                        thumbnail: str, fanart_image: str, plot_summary: str,
@@ -848,66 +834,14 @@ def remove_favorite_video(video_title: str) -> None:
     notify(get_string(30154), video_title)
     xbmc.executebuiltin('Container.Refresh')
 
-
-def favorites_import():
-    """
-    Import favorites from the original 'plugin.video.rumble.matrix' addon to the current addon.
-
-    This function is designed to migrate user favorites after a plugin name change from the original fork.
-    It performs the following steps:
-    1. Prompts the user for confirmation before proceeding with the import.
-    2. Ensures the favorites directory for the current addon exists.
-    3. Attempts to locate and read the favorites file from the original addon.
-    4. If found, copies the content to the current addon's favorites file.
-    5. Notifies the user of the import result.
-
-    The function uses Kodi's xbmcgui, xbmcvfs, and os modules for dialog, file operations, and path handling.
-
-    Returns:
-        None
-
-    Side effects:
-        - May overwrite the current addon's favorites file.
-        - Displays Kodi dialog boxes and notifications.
-
-    Raises:
-        No exceptions are explicitly raised, but file I/O operations may raise exceptions.
-
-    Note:
-        This function assumes the existence of helper functions like favorites_create() and notify().
-        The 'favorites' variable should be defined elsewhere in the code, representing the path
-        to the current addon's favorites file.
-    """
-
-    if not xbmcgui.Dialog().yesno(
-        'Import Favorites',
-        'This will replace the favorites with the plugin.video.rumble.matrix version.\nProceed?',
-        nolabel='Cancel',
-        yeslabel='Ok'
-    ):
-        return
-
-    # Make sure path exists
-    favorites_create()
-
-    # Load matrix favorites
-    rumble_matrix_dir = xbmcvfs.translatePath(
-        os.path.join('special://home/userdata/addon_data/plugin.video.rumble.matrix', 'favorites.dat')
-    )
-
-    if os.path.exists(rumble_matrix_dir):
-        rumble_matrix = open(rumble_matrix_dir).read()
-
-        if rumble_matrix:
-            with open(favorites, 'w') as fav_file:
-                fav_file.write(rumble_matrix)
-
-            notify('Imported Favorites')
-            return
-
-    notify('Favorites Not Found')
+# 📌  import_favs_from_matrix_version.md 📝 🗑️
 
 
+'''
+ *
+ * Stop Here
+ *
+'''
 
 def login_session_reset():
     """
