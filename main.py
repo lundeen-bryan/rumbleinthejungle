@@ -1,7 +1,7 @@
 # Auto updated?
 #   Yes
 # Modified:
-#   Thursday, March 6, 2025 10:38:09 PM PST
+#   Friday, March 7, 2025 7:29:17 AM PST
 #
 """
 The snippet above is from an Ext from TheRepoClub called File Header Generator
@@ -836,16 +836,10 @@ def remove_favorite_video(video_title: str) -> None:
 
 # 📌  import_favs_from_matrix_version.md 📝 🗑️
 
-
-'''
- *
- * Stop Here
- *
-'''
-
 def login_session_reset():
     """
-    Force a reset of the current Rumble user session.
+    Reset the current Rumble user session when the "Reset Session" button is pressed
+    in the add-on settings (found under "Login").
 
     This function performs the following actions:
     1. Resets the session details for the current Rumble user.
@@ -853,141 +847,132 @@ def login_session_reset():
 
     The function does not take any parameters and does not return any values.
 
-    Note:
-    - This function assumes the existence of a global RUMBLE_USER object with a
-      reset_session_details() method.
-    - It also assumes the availability of notify() and get_string() functions for
-      user notifications.
+    Notes:
+    - Assumes the existence of a global RUMBLE_USER object with a reset_session_details() method.
+    - Relies on notify() and get_string() for user notifications.
 
     Usage:
-    Call this function when you need to forcibly clear the current user's session,
-    such as for logout operations or troubleshooting authentication issues.
+    Called automatically when the user clicks the "Reset Session" button in
+    the add-on settings (Login category). It can also be invoked manually as needed
+    to forcibly clear the user's session, for instance to handle logout or resolve
+    authentication issues.
     """
 
     RUMBLE_USER.reset_session_details()
-    # Session Reset
-    notify( get_string(30200) )
+    notify(get_string(30200))
 
-def login_test():
+def manage_rumble_subscription(
+    target_identifier: str,
+    subscription_action: str
+) -> bool:
+    """
+    Manage subscribing or unsubscribing to a Rumble channel or user.
+
+    This function checks for an active session, determines whether the target
+    is a channel or user based on the format of `target_identifier`, and then
+    attempts the specified subscription action through the RUMBLE_USER object.
+
+    Parameters:
+        target_identifier (str): The channel/user identifier in the format
+            '/user/username' or '/c/channelname'.
+        subscription_action (str): Either 'subscribe' or 'unsubscribe'.
+
+    Returns:
+        bool: True if the subscription action succeeded, False otherwise.
+
+    Side Effects:
+        - Modifies the user's subscription status on Rumble.
+        - Displays a notification about the action's result.
+
+    Dependencies:
+        - RUMBLE_USER: An object that manages Rumble user sessions and API requests.
+        - notify: A function to display notifications to the user.
+        - json: Used to parse the API response.
+
+    Usage:
+        success = manage_rumble_subscription('/c/example_channel', 'subscribe')
+        if success:
+            print("Subscription action completed successfully.")
+        else:
+            print("Failed to complete the subscription action.")
+    """
+    # Exit early if there is no active session
+    if not RUMBLE_USER.has_session():
+        notify("Unable to perform action: No active session.")
+        return False
+
+    # Determine the target type based on the identifier
+    subscription_target = None
+    if "/user/" in target_identifier:
+        target_identifier = target_identifier.replace("/user/", "")
+        subscription_target = "user"
+    elif "/c/" in target_identifier:
+        target_identifier = target_identifier.replace("/c/", "")
+        subscription_target = "channel"
+
+    # Proceed only if a valid target type was identified
+    if subscription_target:
+        response = RUMBLE_USER.subscribe(subscription_action, subscription_target, target_identifier)
+        if response:
+            data = json.loads(response)
+            user_data = data.get("user", {})
+            extra_data = data.get("data", {})
+
+            # Check if the user is logged in and the response contains a thumbnail
+            if user_data.get("logged_in") and extra_data.get("thumb"):
+                if subscription_action == "subscribe":
+                    notify(f"Subscribed to {target_identifier}", None, extra_data["thumb"])
+                else:
+                    notify(f"Unsubscribed to {target_identifier}", None, extra_data["thumb"])
+                return True
+
+    # Fallback notification if no successful action took place
+    notify("Unable to perform the requested action.")
+    return False
+
+def test_rumble_login() -> None:
     """
     Reset the current session and test the Rumble user login.
 
-    This function performs the following steps:
-    1. Resets the current session details.
-    2. Checks if login details are available.
-    3. Attempts to log in if details are present.
-    4. Notifies the user of the login result.
-
-    The function uses the RUMBLE_USER object to manage session details and perform login operations.
-    It also uses the notify() function to display messages to the user.
-
-    Returns:
-        None
+    This function:
+        1. Resets the current session details.
+        2. Checks if login details are available.
+        3. Attempts to log in if details are present.
+        4. Notifies the user of the login result.
 
     Side Effects:
         - Resets the current user session.
-        - Displays a notification to the user about the login status.
+        - Displays a notification about the login status.
 
     Notifications:
-        - Login Success (string ID: 30201): Displayed when login is successful.
-        - Login Failed (string ID: 30202): Displayed when login fails.
-        - No details detected (string ID: 30203): Displayed when no login details are found.
+        - 30201 ("Login Success"): Displayed when the login is successful.
+        - 30202 ("Login Failed"): Displayed when the login fails.
+        - 30203 ("No details detected"): Displayed when no login details are provided.
 
     Dependencies:
-        - RUMBLE_USER: An object with methods for managing user sessions and login.
-        - notify(): Function to display notifications to the user.
-        - get_string(): Function to retrieve localized string resources.
+        - RUMBLE_USER: Manages user sessions and login.
+        - notify: Displays notifications to the user.
+        - get_string: Retrieves localized string resources.
 
     Usage:
-        This function is typically called to test user authentication or verify login status.
-        It can be used after changing login credentials or for troubleshooting login issues.
+        Typically called to verify user authentication or troubleshoot login issues.
     """
-
     RUMBLE_USER.reset_session_details()
 
     if RUMBLE_USER.has_login_details():
         if RUMBLE_USER.login():
-            # Login Success
-            notify( get_string(30201) )
+            notify(get_string(30201))  # Login Success
         else:
-            # Login Failed
-            notify( get_string(30202) )
+            notify(get_string(30202))  # Login Failed
     else:
-        # No details detected
-        notify( get_string(30203) )
+        notify(get_string(30203))      # No details detected
 
-def subscribe(name, action):
-    """
-    Attempt to subscribe or unsubscribe to a Rumble channel or user.
+'''
+ *
+ * Stop Here
+ *
+'''
 
-    This function handles the process of subscribing or unsubscribing to a Rumble
-    channel or user. It checks for an active session, determines the action type
-    based on the name format, and performs the subscription action using the
-    RUMBLE_USER object.
-
-    Parameters:
-    name (str): The name of the channel or user to subscribe/unsubscribe to.
-                It should be in the format '/user/username' or '/c/channelname'.
-    action (str): The action to perform, either 'subscribe' or 'unsubscribe'.
-
-    Returns:
-    bool: True if the subscription action was successful, False otherwise.
-
-    Side Effects:
-    - Modifies the user's subscription status on Rumble.
-    - Displays a notification to the user about the action's result.
-
-    Raises:
-    No exceptions are explicitly raised, but JSON parsing errors may occur.
-
-    Dependencies:
-    - RUMBLE_USER: An object that handles Rumble user sessions and API interactions.
-    - notify: A function to display notifications to the user.
-    - json: Used to parse the API response.
-
-    Usage:
-    result = subscribe('/c/example_channel', 'subscribe')
-    if result:
-        print("Successfully subscribed to the channel")
-    else:
-        print("Failed to subscribe to the channel")
-    """
-
-    # make sure we have a session
-    if RUMBLE_USER.has_session():
-
-        action_type = False
-        if '/user/' in name:
-            name = name.replace( '/user/', '' )
-            action_type = 'user'
-        elif '/c/' in name:
-            name = name.replace( '/c/', '' )
-            action_type = 'channel'
-
-        if action_type:
-
-            # subscribe to action
-            data = RUMBLE_USER.subscribe( action, action_type, name )
-
-            if data:
-
-                # Load data from JSON
-                data = json.loads(data)
-
-                # make sure everything looks fine
-                if data.get( 'user', False ) and data.get( 'data', False ) \
-                    and data[ 'user' ][ 'logged_in' ] and data[ 'data' ][ 'thumb' ]:
-
-                    if action == 'subscribe':
-                        notify( 'Subscribed to ' + name, None, data[ 'data' ][ 'thumb' ] )
-                    else:
-                        notify( 'Unubscribed to ' + name, None, data[ 'data' ][ 'thumb' ] )
-
-                    return True
-
-    notify( 'Unable to to perform action' )
-
-    return False
 
 
 def add_dir(name, url, mode, images={}, info_labels={}, cat='', folder=True, fav_context=False, play=0, subscribe_context=False):
@@ -1217,9 +1202,8 @@ def comments_show(url):
     else:
         notify( "Cannot find comments", "Comments" )
 
-def main():
 # 📌  main_notes.md 📝 🗑️
-
+def main():
     """
     Main entry point for the Rumble video Kodi plugin.
 
