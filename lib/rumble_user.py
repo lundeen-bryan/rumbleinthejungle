@@ -1,7 +1,7 @@
 # Auto updated?
 #   Yes
 # Modified:
-#   Sunday, March 2, 2025 12:40:10 PM PST
+#   Saturday, March 8, 2025 10:30:20 PM PST
 #
 """
 The snippet above is from an Ext from TheRepoClub called File Header Generator
@@ -41,11 +41,11 @@ Notes: ............. _
 ===========================================================================================
 """
 
-
 import math
 import time
 import re
 
+import xbmc
 import xbmcaddon
 
 from lib.general import request_get
@@ -250,6 +250,8 @@ class RumbleUser:
 
         """ method to add video to playlist """
 
+        xbmc.log("[DEBUG] playlist_add_video: playlist_id: %s, video_id: %s" % (playlist_id, video_id), xbmc.LOGDEBUG)
+
         if self.has_session():
 
             post_content = {
@@ -262,12 +264,15 @@ class RumbleUser:
                 'Content-type': 'application/x-www-form-urlencoded'
             }
 
+            xbmc.log("[DEBUG] playlist_add_video: URL: %s, DAta: %s, Headers: %s" % (self.base_url + '/service.php?name=playlist.add_video', post_content, headers), xbmc.LOGDEBUG)
             data = request_get(
                 self.base_url + '/service.php?name=playlist.add_video',
                 post_content,
                 headers
             )
+            xbmc.log("[DEBUG] playlist_add_video: Response: %s" % (data), xbmc.LOGDEBUG)
 
+            xbmc.log("[DEBUG] playlist_add_video: data: %s" % (data), xbmc.LOGDEBUG)
             return data
 
         return False

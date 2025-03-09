@@ -1,7 +1,7 @@
 # Auto updated?
 #   Yes
 # Modified:
-#   Friday, March 7, 2025 7:29:17 AM PST
+#   Saturday, March 8, 2025 11:19:20 PM PST
 #
 """
 The snippet above is from an Ext from TheRepoClub called File Header Generator
@@ -400,6 +400,9 @@ def create_directory_listing(html_data: str, category: str, listing_type: str = 
     Returns:
         int: The number of directory listing items created.
     """
+    xbmc.log(
+        f"[DEBUG] create_directory_listing called with listing_type={listing_type}, category={category}, is_search={is_search}, play_mode={play_mode}",
+    )
     item_count = 0
     one_line_titles = ADDON.getSetting('one_line_titles') == 'true'
 
@@ -583,8 +586,19 @@ def extract_playlist_video_id(url: str) -> Optional[str]:
         Optional[str]: The extracted playlist video ID if found; otherwise, None.
     """
     html_content = request_get(url)
+    xbmc.log(f"HTML content: {html_content}", xbmc.LOGDEBUG) # Log the HTML content to debugging
+
     match = re.search(r'data-id="([0-9]+)"', html_content, re.MULTILINE | re.DOTALL | re.IGNORECASE)
-    return match.group(1) if match else None
+    # Update regex to search for hx-vals attribute and extract the video ID
+    # match = re.search(r'hx-vals="[^"]*video_id":(\d+)', html_content, re.MULTILINE | re.DOTALL | re.IGNORECASE)
+
+    if match:
+        video_id = match.group(1)
+        xbmc.log(f"Found video ID: {video_id}", xbmc.LOGDEBUG)
+        return video_id
+    else:
+        xbmc.log(f"Unable to find the video ID from the URL: {url}", xbmc.LOGWARNING)
+    return None
 
 def resolve_video_url(video_url: str) -> Optional[str]:
     """
@@ -967,14 +981,6 @@ def test_rumble_login() -> None:
     else:
         notify(get_string(30203))      # No details detected
 
-'''
- *
- * Stop Here
- *
-'''
-
-
-
 def add_dir(name, url, mode, images={}, info_labels={}, cat='', folder=True, fav_context=False, play=0, subscribe_context=False):
     """
     Adds a directory item to the Kodi interface for the Rumble video addon.
@@ -1120,42 +1126,69 @@ def add_dir(name, url, mode, images={}, info_labels={}, cat='', folder=True, fav
 
     xbmcplugin.addDirectoryItem(handle=PLUGIN_ID, url=link, listitem=list_item, isFolder=folder)
 
-def playlist_manage(url, action="add"):
+
+def manage_rumble_playlist(video_url: str, playlist_action: str = "add") -> None:
     """
-    Manages a video in Rumble's playlist by adding or deleting it.
+    Manage a video in Rumble's playlist by adding or deleting it.
 
-    This function extracts the video ID from the given URL and performs
-    the specified action (add or delete) on Rumble's playlist. It then
-    notifies the user about the result of the operation.
+    Extracts the video ID from the provided video URL and performs the specified action
+    (either "add" or "delete") on the Rumble playlist. It then notifies the user about
+    the outcome of the operation. One primary list is the Watch Later list.
 
-    Parameters:
-    url (str): The URL of the video to be managed in the playlist.
-    action (str, optional): The action to perform on the playlist.
-                            Can be either "add" or "delete". Defaults to "add".
+    Parameters
+    ----------
+    video_url : str
+        The URL of the video to be managed in the playlist.
+    playlist_action : str, optional
+        The action to perform on the playlist; must be either "add" or "delete".
+        Defaults to "add".
 
-    Returns:
+    Returns
+    -------
     None
 
-    Side Effects:
-    - Modifies the user's Rumble playlist.
-    - Displays a notification to the user about the result of the operation.
-    """
+    Side Effects
+    ------------
+    - Modifies the user's Rumble playlist by adding or deleting a video.
+    - Displays a notification to the user regarding the operation's success or failure.
 
-    video_id = get_playlist_video_id(url)
+    Notifications
+    -------------
+    - Utilizes the `notify` function to present messages to the user about the operation result.
+
+    Dependencies
+    ------------
+    - Requires a function `get_playlist_video_id(video_url: str) -> Optional[str]` to extract the video ID.
+    - Expects a `RUMBLE_USER` object with methods:
+        - `playlist_add_video(video_id: str)` for adding a video.
+        - `playlist_delete_video(video_id: str)` for deleting a video.
+    - Depends on a `notify(message: str, title: str)` function for user notifications.
+    """
+    video_id = extract_playlist_video_id(video_url)
     if video_id:
-        if action == "add":
+        if playlist_action == "add":
             RUMBLE_USER.playlist_add_video(video_id)
-            message = "Added to playlist"
+            notification_message = "Added to playlist"
         else:
             RUMBLE_USER.playlist_delete_video(video_id)
-            message = "Deleted from playlist"
+            notification_message = "Deleted from playlist"
     else:
-        if action == "add":
-            message = "Cannot add to playlist"
+        if playlist_action == "add":
+            notification_message = "Cannot add to playlist"
         else:
-            message = "Cannot delete from playlist"
+            notification_message = "Cannot delete from playlist"
 
-    notify(message, "Playlist")
+    notify(notification_message, "Playlist")
+
+
+'''
+ *
+ * Stop Here
+ *
+'''
+
+
+
 
 def comments_show(url):
     """
@@ -1322,7 +1355,7 @@ def main():
     elif mode == 11:
         subscribe(name, cat)
     elif mode == 12:
-        playlist_manage(url, cat)
+        manage_rumble_playlist(url, cat)
     elif mode == 13:
         comments_show(url)
     elif mode == 14:
