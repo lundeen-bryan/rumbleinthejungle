@@ -1,7 +1,7 @@
 # Auto updated?
 #   Yes
 # Modified:
-#   Saturday, March 8, 2025 11:19:20 PM PST
+#   Sunday, March 9, 2025 8:57:25 AM PDT
 #
 """
 The snippet above is from an Ext from TheRepoClub called File Header Generator
@@ -307,36 +307,42 @@ def extract_image_url(html_content: str, image_id: int) -> str:
 
 def get_video_id(url):
     """
-    Extracts the video ID from a Rumble video URL.
+    Extracts the numeric video ID from a Rumble video page by parsing the hx-vals attribute.
 
-    This function fetches the HTML content of the given Rumble video URL and uses
-    a regular expression to extract the video ID from the embed URL found in the page.
+    This function fetches the HTML content from the given video URL and looks for an hx-vals
+    attribute that contains a JSON string with a "video_id" key. For example, it expects a line like:
+
+        hx-vals='{"video_id":403302952}'
+
+    The JSON is then parsed to retrieve the video_id value. If successful, the video_id is returned
+    as a string. Otherwise, the function returns False.
 
     Args:
-        url (str): The Rumble video URL from which to extract the video ID.
+        url (str): The Rumble video URL.
 
     Returns:
-        str or False: The extracted video ID if found, or False if no video ID could be extracted.
-
-    Raises:
-        Any exceptions raised by the request_get function (e.g., network errors).
-
-    Example:
-        >>> video_id = get_video_id("https://rumble.com/v2jqx56-example-video.html")
-        >>> print(video_id)
-        'v2jqx56'
+        str or False: The extracted video_id if found; otherwise, False.
     """
-
     data = request_get(url)
 
-    video_id = re.compile(
-        ',\"embedUrl\":\"' + BASE_URL + '/embed/(.*?)\/\",',
-        re.MULTILINE|re.DOTALL|re.IGNORECASE
-    ).findall(data)
+    # Look for the hx-vals attribute that contains the JSON with "video_id"
+    hx_vals_match = re.search(r"hx-vals\s*=\s*'({\"video_id\":\s*\d+\s*})'", data)
+    if hx_vals_match:
+        hx_json_str = hx_vals_match.group(1)
+        try:
+            hx_data = json.loads(hx_json_str)
+            video_id = str(hx_data.get("video_id"))
+            xbmc.log("[DEBUG] get_video_id: Extracted video_id from hx-vals: " + video_id, xbmc.LOGDEBUG)
+            return video_id
+        except Exception as e:
+            xbmc.log("[DEBUG] get_video_id: Error parsing hx-vals JSON: " + str(e), xbmc.LOGDEBUG)
+    else:
+        xbmc.log("[DEBUG] get_video_id: hx-vals attribute not found in the page.", xbmc.LOGDEBUG)
 
-    if video_id:
-        return video_id[0]
     return False
+
+
+
 
 
 def list_rumble(url, cat):
@@ -570,14 +576,19 @@ def create_directory_listing(html_data: str, category: str, listing_type: str = 
                 add_dir(video_title, BASE_URL + channel_link, 3, images, {}, category, True, True, play_mode, {'name': channel_link, 'subscribe': True})
     return item_count
 
-
 def extract_playlist_video_id(url: str) -> Optional[str]:
     """
     Retrieve and extract the playlist video ID from a given URL.
 
-    This function fetches the HTML content from the specified URL using `request_get`,
-    then uses a regular expression to locate the 'data-id' attribute. This ID is essential
-    for operations like adding videos to playlists.
+    This function fetches the HTML content from the specified URL using `request_get`
+    and attempts to locate the video ID by parsing the hx-vals attribute that contains
+    a JSON string with a "video_id" key. For example, it looks for a snippet like:
+
+        hx-vals='{"video_id":403302952}'
+
+    If found, it parses the JSON to extract the video_id. If this method fails, it falls
+    back to searching for a data-id attribute. The returned video_id should be the one
+    expected by Rumble’s API (e.g. 403302952).
 
     Args:
         url (str): The URL of the playlist video page.
@@ -586,19 +597,32 @@ def extract_playlist_video_id(url: str) -> Optional[str]:
         Optional[str]: The extracted playlist video ID if found; otherwise, None.
     """
     html_content = request_get(url)
-    xbmc.log(f"HTML content: {html_content}", xbmc.LOGDEBUG) # Log the HTML content to debugging
+    xbmc.log(f"HTML content: {html_content}", xbmc.LOGDEBUG)  # Log HTML for debugging
 
+    # First, attempt to extract video_id from the hx-vals attribute
+    hx_vals_match = re.search(r"hx-vals\s*=\s*'({\"video_id\":\s*\d+[^']*})'",
+                              html_content,
+                              re.MULTILINE | re.DOTALL | re.IGNORECASE)
+    if hx_vals_match:
+        hx_json_str = hx_vals_match.group(1)
+        try:
+            hx_data = json.loads(hx_json_str)
+            video_id = str(hx_data.get("video_id"))
+            xbmc.log(f"Found video ID from hx-vals: {video_id}", xbmc.LOGDEBUG)
+            return video_id
+        except Exception as e:
+            xbmc.log(f"Error parsing hx-vals JSON: {e}", xbmc.LOGDEBUG)
+
+    # Fallback: search for the data-id attribute
     match = re.search(r'data-id="([0-9]+)"', html_content, re.MULTILINE | re.DOTALL | re.IGNORECASE)
-    # Update regex to search for hx-vals attribute and extract the video ID
-    # match = re.search(r'hx-vals="[^"]*video_id":(\d+)', html_content, re.MULTILINE | re.DOTALL | re.IGNORECASE)
-
     if match:
         video_id = match.group(1)
-        xbmc.log(f"Found video ID: {video_id}", xbmc.LOGDEBUG)
+        xbmc.log(f"Found video ID from data-id: {video_id}", xbmc.LOGDEBUG)
         return video_id
     else:
         xbmc.log(f"Unable to find the video ID from the URL: {url}", xbmc.LOGWARNING)
     return None
+
 
 def resolve_video_url(video_url: str) -> Optional[str]:
     """
@@ -1127,58 +1151,57 @@ def add_dir(name, url, mode, images={}, info_labels={}, cat='', folder=True, fav
     xbmcplugin.addDirectoryItem(handle=PLUGIN_ID, url=link, listitem=list_item, isFolder=folder)
 
 
-def manage_rumble_playlist(video_url: str, playlist_action: str = "add") -> None:
+def update_watch_later_video(video_url: str, action: str = "add") -> None:
     """
-    Manage a video in Rumble's playlist by adding or deleting it.
+    Updates the Watch Later playlist by adding or removing a video.
 
-    Extracts the video ID from the provided video URL and performs the specified action
-    (either "add" or "delete") on the Rumble playlist. It then notifies the user about
-    the outcome of the operation. One primary list is the Watch Later list.
+    This function extracts the video ID from the given URL and then either adds or removes
+    the video from the Watch Later playlist by calling the corresponding API endpoint via
+    the RumbleUser methods. Detailed debug logging is performed to record the full JSON response.
 
-    Parameters
-    ----------
-    video_url : str
-        The URL of the video to be managed in the playlist.
-    playlist_action : str, optional
-        The action to perform on the playlist; must be either "add" or "delete".
-        Defaults to "add".
+    Parameters:
+        video_url (str): The URL of the video to be updated in the Watch Later playlist.
+        action (str, optional): The action to perform; "add" to add the video, or any other value
+                                (typically "delete") to remove the video. Defaults to "add".
 
-    Returns
-    -------
-    None
-
-    Side Effects
-    ------------
-    - Modifies the user's Rumble playlist by adding or deleting a video.
-    - Displays a notification to the user regarding the operation's success or failure.
-
-    Notifications
-    -------------
-    - Utilizes the `notify` function to present messages to the user about the operation result.
-
-    Dependencies
-    ------------
-    - Requires a function `get_playlist_video_id(video_url: str) -> Optional[str]` to extract the video ID.
-    - Expects a `RUMBLE_USER` object with methods:
-        - `playlist_add_video(video_id: str)` for adding a video.
-        - `playlist_delete_video(video_id: str)` for deleting a video.
-    - Depends on a `notify(message: str, title: str)` function for user notifications.
+    Side Effects:
+        - Sends a request to Rumble's API to update the playlist.
+        - Logs the full response for debugging.
+        - Displays a notification to the user based on the outcome.
     """
     video_id = extract_playlist_video_id(video_url)
-    if video_id:
-        if playlist_action == "add":
-            RUMBLE_USER.playlist_add_video(video_id)
-            notification_message = "Added to playlist"
-        else:
-            RUMBLE_USER.playlist_delete_video(video_id)
-            notification_message = "Deleted from playlist"
-    else:
-        if playlist_action == "add":
-            notification_message = "Cannot add to playlist"
-        else:
-            notification_message = "Cannot delete from playlist"
+    if not video_id:
+        message = "Cannot update playlist (video ID not found)"
+        notify(message, "Watch Later Playlist")
+        return
 
-    notify(notification_message, "Playlist")
+    if action == "add":
+        response = RUMBLE_USER.playlist_add_video(video_id)
+    else:
+        response = RUMBLE_USER.playlist_delete_video(video_id)
+
+    try:
+        response_data = json.loads(response)
+        xbmc.log("[DEBUG] Full watch later update response: " + str(response_data), xbmc.LOGDEBUG)
+
+        if "data" in response_data:
+            # For "add", we expect a video object with a matching 'fid'
+            if action == "add":
+                video_info = response_data["data"].get("video")
+                if video_info and video_info.get("fid") == int(video_id):
+                    message = "Added to Watch Later"
+                else:
+                    message = "Error: Video data missing or ID mismatch in response"
+            else:
+                # For delete, we simply check that the "data" key exists.
+                message = "Removed from Watch Later"
+        else:
+            message = "Error: 'data' key not found in API response"
+    except Exception as e:
+        message = f"Error parsing API response: {e}"
+
+    notify(message, "Watch Later Playlist")
+
 
 
 '''
@@ -1355,7 +1378,7 @@ def main():
     elif mode == 11:
         subscribe(name, cat)
     elif mode == 12:
-        manage_rumble_playlist(url, cat)
+        update_watch_later_video(url, cat)
     elif mode == 13:
         comments_show(url)
     elif mode == 14:
