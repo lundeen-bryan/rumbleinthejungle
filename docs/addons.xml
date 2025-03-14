@@ -1,7 +1,7 @@
 <addons>
     <addon id="repository.rumbleinthejungle"
            name="Rumble in the Jungle Repository"
-           version="1.0.0"
+           version="1.0.1"
            provider-name="Lundeen Bryan"
            extension="repository">
         <extension point="xbmc.addon.repository"
