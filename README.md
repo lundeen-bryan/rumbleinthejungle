@@ -30,7 +30,7 @@ This add-on is built using **Python 3.11+** and is compatible with **Kodi 21 Ome
 
 ## **Installation**
 
-### **Option 1: Install from ZIP**
+### **Option 1: Install from ZIP** (Recommended)
 
 1. Download the latest `plugin.video.rumbleinthejungle.zip` file from the [Releases](https://github.com/lundeen-bryan/rumbleinthejungle/releases) page.
 2. Open Kodi and navigate to:
@@ -39,7 +39,7 @@ Add-ons > Install from ZIP file
 4. After installation, find the add-on under:
 Add-ons > Video Add-ons > Rumble In The Jungle
 
-### **Option 2: Install via Kodi Source**
+### **Option 2: Install via Kodi Source** (Currently under development)
 
 1. **Open Kodi** and navigate to: Settings > File Manager
 2. **Add Source** and when prompted for the path, enter: https://lundeen-bryan.github.io/rumbleinthejungle/
