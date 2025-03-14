@@ -1,0 +1,17 @@
+<addons>
+    <addon id="repository.rumbleinthejungle"
+           name="Rumble in the Jungle Repository"
+           version="1.0.0"
+           provider-name="Lundeen Bryan"
+           extension="repository">
+        <extension point="xbmc.addon.repository"
+                   name="Rumble in the Jungle Repo"
+                   info="https://lundeen-bryan.github.io/rumbleinthejungle/addons.xml"
+                   checksum="https://lundeen-bryan.github.io/rumbleinthejungle/addons.xml.md5"
+                   datadir="https://lundeen-bryan.github.io/rumbleinthejungle/zips/"/>
+        <extension point="xbmc.addon.metadata">
+            <summary lang="en">A repository for the Rumble in the Jungle Kodi add-on</summary>
+            <description lang="en">This repository hosts the Rumble in the Jungle add-on.</description>
+        </extension>
+    </addon>
+</addons>
