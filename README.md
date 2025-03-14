@@ -61,9 +61,13 @@ Once installed:
 ## **Features**
 
 ✅ Browse **Rumble** videos within Kodi
+
 ✅ Stream videos directly using Kodi's built-in player
+
 ✅ Simple UI with list and grid views
+
 ✅ Search functionality for finding specific videos
+
 ✅ Compatible with **Kodi 21 Omega**
 
 ---
