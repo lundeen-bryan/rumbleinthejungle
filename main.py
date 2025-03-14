@@ -1,7 +1,7 @@
 # Auto updated?
 #   Yes
 # Modified:
-#   Sunday, March 9, 2025 8:57:25 AM PDT
+#   Friday, March 14, 2025 4:16:26 PM PDT
 #
 """
 The snippet above is from an Ext from TheRepoClub called File Header Generator
@@ -1376,7 +1376,7 @@ def main():
     elif mode == 10:
         login_session_reset()
     elif mode == 11:
-        subscribe(name, cat)
+        manage_rumble_subscription(name, cat)
     elif mode == 12:
         update_watch_later_video(url, cat)
     elif mode == 13:
