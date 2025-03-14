@@ -68,35 +68,23 @@ Once installed:
 
 ---
 
-## **Dependencies**
-
-This add-on requires the following Python libraries:
-
-- [`requests`](https://pypi.org/project/requests/) - Fetch video data from Rumble
-- [`beautifulsoup4`](https://pypi.org/project/beautifulsoup4/) - Web scraping (if API is unavailable)
-- [`urllib3`](https://pypi.org/project/urllib3/) - Handling HTTP requests
-
-### **Installing Dependencies (For Developers)**
-If developing locally, install dependencies with:
-```bash
-pip install -r requirements.txt
-```
-
 ## Development
 
 ### Project Structure
 
+<pre>
 plugin.video.rumbleinthejungle
  ┣ lib
  ┣ resources
  ┃ ┗ settings.xml
- ┣ .gitignore
+ ┣ gitignore
  ┣ addon.xml
  ┣ CHANGELOG.md
  ┣ fanart.png
  ┣ icon.png
  ┣ main.py
  ┗ README.md
+</pre>
 
 ## Running in Kodi
 
